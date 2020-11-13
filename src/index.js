@@ -1,26 +1,27 @@
-// import Vue from 'vue'
 // import Exposure from './exposure'
 import Click from './click'
 import Browse from './browse'
 
-const install = function (Vue, serverUrl) {
+const install = function (Vue, trackPlushConfig) {
     Vue.directive('track', {
         bind(el, binding) {
             const { arg } = binding
             arg.split('|').forEach((item) => {
                 // 点击
                 if (item === 'click') {
-                    new Click(serverUrl).handleClickEvent({
+                    new Click(trackPlushConfig).handleClickEvent({
                         el,
                     })
                 }
+                // 曝光
                 // else if (item === 'exposure') {
-                //     new Exposure(self.serverUrl).handleExposureEvent({
+                //     new Exposure(trackPlushConfig).handleExposureEvent({
                 //         el,
                 //     })
                 // }
+                // 浏览
                 else if (item === 'browse') {
-                    new Browse(serverUrl).handleBrowseEvent({
+                    new Browse(trackPlushConfig).handleBrowseEvent({
                         el,
                     })
                 }

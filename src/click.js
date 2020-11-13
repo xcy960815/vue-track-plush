@@ -1,13 +1,21 @@
 import request from './fetch'
 
 export default class Click {
-    constructor(serverUrl) {
-        this.serverUrl = serverUrl || ''
+    constructor(trackPlushConfig) {
+        this.trackPlushConfig = trackPlushConfig || null
     }
     handleClickEvent(entry) {
-        const tp = entry.el.attributes['track-params'].value
+        const trackParams = entry.el.attributes['track-params']
+        const buttonName = trackParams ? trackParams.value : null
         entry.el.addEventListener('click', () => {
-            this.track(tp)
+            this.track({
+                buttonName,
+                userAgent:
+                    this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
+                pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
+                projectName: this.trackPlushConfig.projectName, //项目名称
+                actionType: '点击事件',
+            })
         })
     }
     /**
@@ -15,12 +23,12 @@ export default class Click {
      * @param {Object} data
      */
     track(data) {
-        console.log(`Track data to server: ${JSON.stringify(data)}`)
         new request({
-            baseURL: this.serverUrl,
+            timeout: 10000,
+            baseURL: this.trackPlushConfig.baseURL,
             withCredentials: true,
-            url: 'track',
-            method: 'post',
+            url: this.trackPlushConfig.url,
+            method: this.trackPlushConfig.method || 'post',
             data,
         })
     }

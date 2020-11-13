@@ -4,15 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>基于vue自定义指令的埋点</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12"></script>
 </head>
 
 <body>
-    <script src="../dist/handler.umd.js"></script>
-    <script>
+    <div id="app"></div>
 
-        handler.consoler()
-        console.log(handler)
+    <script src="./index.umd.js"></script>
+    <script>
+        Vue.use(VueTrackPlush, { projectName: "项目名称", baseURL: "http://d.daily.vdian.net", url: "/api/action/record" })
+        new Vue({
+            el: '#app',
+            template: `<div v-track:browse track-params="页面名称">
+                            <button v-on:click="handleClick" v-track:click track-params="按钮名称">button</button>
+                        </div>`,
+            methods: {
+                handleClick() {
+                    console.log("handleClick")
+                }
+            }
+        })
     </script>
 </body>
 

@@ -2,13 +2,20 @@ import request from './fetch'
 
 // 页面浏览
 export default class Browse {
-    constructor(serverUrl) {
-        this.serverUrl = serverUrl || ''
+    constructor(trackPlushConfig) {
+        this.trackPlushConfig = trackPlushConfig || {}
     }
     // 处理浏览事件
     handleBrowseEvent(entry) {
-        const tp = entry.el.attributes['track-params'].value
-        this.track(tp)
+        const trackParams = entry.el.attributes['track-params']
+        const pageName = trackParams ? trackParams.value : null
+        this.track({
+            pageName, //页面名称
+            userAgent: this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
+            pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
+            projectName: this.trackPlushConfig.projectName, //项目名称
+            actionType: '浏览事件',
+        })
     }
 
     /**
@@ -16,12 +23,13 @@ export default class Browse {
      * @param {Object} data
      */
     track(data) {
-        console.log(`Track data to server: ${JSON.stringify(data)}`)
-        request({
-            baseURL: this.serverUrl,
+        console.log('事件上报')
+        new request({
+            timeout: 10000,
+            baseURL: this.trackPlushConfig.baseURL,
             withCredentials: true,
-            url: 'track',
-            method: 'post',
+            url: this.trackPlushConfig.url,
+            method: this.trackPlushConfig.method || 'post',
             data,
         })
     }

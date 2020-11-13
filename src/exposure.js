@@ -1,13 +1,13 @@
 import 'intersection-observer'
-// import { track } from './sendData'
 import request from './fetch'
 // 节流时间调整，默认100ms
 IntersectionObserver.prototype['THROTTLE_TIMEOUT'] = 300
 
 export default class Exposure {
-    constructor(maxNum = 20) {
+    constructor(trackPlushConfig) {
+        this.trackPlushConfig = trackPlushConfig
         this.cacheDataArr = []
-        this.maxNum = maxNum
+        this.maxNum = trackPlushConfig.maxNum || 20
         this._timer = 0
         this._observer = null
         this.init()
@@ -24,29 +24,30 @@ export default class Exposure {
 
         // 实例化监听
         this._observer = new IntersectionObserver(
-            function(entries, observer) {
+            function (entries, observer) {
                 entries.forEach((entry) => {
                     // 出现在视窗中
                     if (entry.isIntersecting) {
                         // 清除当前定时器
                         clearInterval(this._timer)
-
+                        const trackParams =
+                            entry.target.attributes['track-params']
                         // 获取参数
-                        const tp = entry.target.attributes['track-params'].value
+                        const tp = trackParams ? trackParams.value : null
                         // 收集参数统一上报，减少网络请求
                         self.cacheDataArr.push(tp)
                         // 曝光之后取消观察
                         self._observer.unobserve(entry.target)
-
+                        // 当储存的数量达到了最大上传存储量的时候 进行上报
                         if (self.cacheDataArr.length >= self.maxNum) {
                             self.track()
                         } else {
                             self.storeIntoLocalStorage(self.cacheDataArr)
                             if (self.cacheDataArr.length > 0) {
-                                // 没2秒上报一次
-                                self._timer = setInterval(function() {
+                                // 每2秒上报一次
+                                self._timer = setInterval(function () {
                                     self.track()
-                                }, 20000)
+                                }, 2000)
                             }
                         }
                     }
@@ -59,27 +60,7 @@ export default class Exposure {
             }
         )
     }
-    /**
-     * 事件上报
-     * @param {Object} params
-     */
-    track(params) {
-        console.log(`Track data to server: ${JSON.stringify(params)}`)
-        // _track(params)
-    }
-    /**
-     * 发送上报数据
-     * @param {Object} data
-     */
-    _track(data) {
-        return request({
-            baseURL: '',
-            withCredentials: true,
-            url: 'track',
-            method: 'post',
-            data,
-        })
-    }
+
     /**
      * 给元素添加监听
      * @param {Element} entry
@@ -87,15 +68,22 @@ export default class Exposure {
     handleExposureEvent(entry) {
         this._observer && this._observer.observe(entry.el)
     }
-
     /**
      * 埋点上报
      */
     track() {
-        const trackData = this.cacheDataArr.splice(0, this.maxNum)
-        track(trackData)
+        const data = this.cacheDataArr.splice(0, this.maxNum)
+        // track(data)
+        // new request({
+        //     timeout: 10000,
+        //     baseURL: this.trackPlushConfig.baseURL,
+        //     withCredentials: true,
+        //     url: this.trackPlushConfig.url,
+        //     method: this.trackPlushConfig.method || 'post',
+        //     data,
+        // })
         // 更新localStoragee
-        this.storeIntoLocalStorage(this.cacheDataArr)
+        // this.storeIntoLocalStorage(this.cacheDataArr)
     }
 
     /**

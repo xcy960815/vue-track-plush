@@ -9,18 +9,21 @@ export default class Service {
         // 创建实例
         const service = Axios.create()
         // 请求拦截
-        service.interceptors.request.use(
-            (config) => {
-                return config
-            },
-            (error) => {
-                return Promise.reject(error)
-            }
-        )
+        // service.interceptors.request.use(
+        //     (config) => {
+        //         return config
+        //     },
+        //     (error) => {
+        //         return Promise.reject(error)
+        //     }
+        // )
+        // 执行实例
         service(this.requestConfig)
-            .then((res) => {})
+            .then((res) => {
+                console.log(res)
+            })
             .catch((error) => {
-                console.error(error)
+                return Promise.reject(error)
             })
     }
 }
