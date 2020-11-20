@@ -2,8 +2,7 @@ import { terser } from 'rollup-plugin-terser'
 import { nodeResolve } from '@rollup/plugin-node-resolve' //将外部引入的js打包进来
 import commonjs from '@rollup/plugin-commonjs' //将commonjs 转换成es5
 import babel from 'rollup-plugin-babel'
-import del from 'rollup-plugin-delete' //
-import json from 'rollup-plugin-json'
+import del from 'rollup-plugin-delete'
 import nodePolyfills from 'rollup-plugin-node-polyfills'
 import serve from 'rollup-plugin-serve'
 import livereload from 'rollup-plugin-livereload'
@@ -43,7 +42,6 @@ export default {
             exclude: 'node_modules/**',
         }),
         nodePolyfills(),
-        json(),
         // 开启服务
         !isProduction &&
             serve({
