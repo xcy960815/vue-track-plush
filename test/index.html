@@ -19,7 +19,9 @@
 
     <script src="./index.umd.js"></script>
     <script>
+
         Vue.use(VueTrackPlush, { projectName: "项目名称", baseURL: "http://d.daily.vdian.net", url: "/api/action/record" })
+        VueTrackPlush.browseEvent({ projectName: "项目名称", baseURL: "http://d.daily.vdian.net", url: "/api/action/record" })
         new Vue({
             el: '#app',
             template: `<div v-track:browse track-params="页面名称">

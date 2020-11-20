@@ -19,9 +19,7 @@ export default class Service {
         // )
         // 执行实例
         service(this.requestConfig)
-            .then((res) => {
-                console.log(res)
-            })
+            .then((res) => {})
             .catch((error) => {
                 return Promise.reject(error)
             })

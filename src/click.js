@@ -5,18 +5,30 @@ export default class Click {
         this.trackPlushConfig = trackPlushConfig || null
     }
     handleClickEvent(entry) {
-        const trackParams = entry.el.attributes['track-params']
-        const buttonName = trackParams ? trackParams.value : null
-        entry.el.addEventListener('click', () => {
+        if (entry.type === 'customize') {
             this.track({
-                buttonName,
+                buttonName: entry.buttonName,
                 userAgent:
                     this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
                 pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
                 projectName: this.trackPlushConfig.projectName, //项目名称
                 actionType: '点击事件',
             })
-        })
+        } else {
+            const trackParams = entry.el.attributes['track-params']
+            const buttonName = trackParams ? trackParams.value : null
+            entry.el.addEventListener('click', () => {
+                this.track({
+                    buttonName,
+                    userAgent:
+                        this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
+                    pageUrl:
+                        this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
+                    projectName: this.trackPlushConfig.projectName, //项目名称
+                    actionType: '点击事件',
+                })
+            })
+        }
     }
     /**
      * 事件上报

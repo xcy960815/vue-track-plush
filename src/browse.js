@@ -7,15 +7,27 @@ export default class Browse {
     }
     // 处理浏览事件
     handleBrowseEvent(entry) {
-        const trackParams = entry.el.attributes['track-params']
-        const pageName = trackParams ? trackParams.value : null
-        this.track({
-            pageName, //页面名称
-            userAgent: this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
-            pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
-            projectName: this.trackPlushConfig.projectName, //项目名称
-            actionType: '浏览事件',
-        })
+        if (entry.type === 'customize') {
+            this.track({
+                pageName: entry.pageName, //页面名称
+                userAgent:
+                    this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
+                pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
+                projectName: this.trackPlushConfig.projectName, //项目名称
+                actionType: '浏览事件',
+            })
+        } else {
+            const trackParams = entry.el.attributes['track-params']
+            const pageName = trackParams ? trackParams.value : null
+            this.track({
+                pageName, //页面名称
+                userAgent:
+                    this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
+                pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
+                projectName: this.trackPlushConfig.projectName, //项目名称
+                actionType: '浏览事件',
+            })
+        }
     }
 
     /**
@@ -23,7 +35,6 @@ export default class Browse {
      * @param {Object} data
      */
     track(data) {
-        console.log('事件上报')
         new request({
             timeout: 10000,
             baseURL: this.trackPlushConfig.baseURL,
