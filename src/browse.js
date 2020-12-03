@@ -7,6 +7,7 @@ export default class Browse {
     }
     // 处理浏览事件
     handleBrowseEvent(entry) {
+        console.log(entry)
         if (entry.type === 'customize') {
             this.track({
                 pageName: entry.pageName, //页面名称

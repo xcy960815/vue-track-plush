@@ -24,7 +24,8 @@ const install = function (Vue, trackPlushConfig) {
                 // 浏览
                 else if (item === 'browse') {
                     new Browse(trackPlushConfig).handleBrowseEvent({
-                        type: 'customize',
+                        type: 'instruction',
+                        el,
                     })
                 }
             })

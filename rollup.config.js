@@ -47,7 +47,7 @@ export default {
             serve({
                 open: false,
                 host: 'localhost',
-                port: 9009,
+                port: 9999,
                 historyApiFallback: true,
                 contentBase: 'test',
                 headers: {
