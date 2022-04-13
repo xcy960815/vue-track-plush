@@ -2,14 +2,13 @@ import request from './fetch'
 
 export default class Click {
     constructor(trackPlushConfig) {
-        this.trackPlushConfig = trackPlushConfig || null
+        this.trackPlushConfig = trackPlushConfig || {}
     }
     handleClickEvent(entry) {
         if (entry.type === 'customize') {
             this.track({
                 buttonName: entry.buttonName,
-                userAgent:
-                    this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
+                userAgent: this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
                 pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
                 projectName: this.trackPlushConfig.projectName, //项目名称
                 actionType: '点击事件',
@@ -20,10 +19,8 @@ export default class Click {
             entry.el.addEventListener('click', () => {
                 this.track({
                     buttonName,
-                    userAgent:
-                        this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
-                    pageUrl:
-                        this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
+                    userAgent: this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
+                    pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
                     projectName: this.trackPlushConfig.projectName, //项目名称
                     actionType: '点击事件',
                 })
