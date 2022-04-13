@@ -14,21 +14,20 @@ export default {
             file: './dist/index.umd.js',
             format: 'umd',
             name: 'VueTrackPlush',
+            global: {
+                "axios": "axios",
+            }
         },
         {
             file: './test/index.umd.js',
             format: 'umd',
             name: 'VueTrackPlush',
-        },
-        {
-            file: './dist/index.amd.js',
-            format: 'amd',
-        },
-        {
-            file: './dist/index.es.js',
-            format: 'es',
+            global: {
+                "axios": "axios",
+            }
         },
     ],
+    external: ['Axios'],
     plugins: [
         //源代码更改马上清空dist文件夹下面打包过的文件 防止代码冗余
         del({ targets: ['dist', 'test/index.umd.js'] }),

@@ -3,7 +3,7 @@ import Click from './click'
 import Browse from './browse'
 
 // 指令 触发
-const install = function (Vue, trackPlushConfig) {
+export const install = function (Vue, trackPlushConfig) {
     Vue.directive('track', {
         bind(el, binding) {
             const { arg } = binding
@@ -47,4 +47,4 @@ export function browseEvent(trackPlushConfig) {
     })
 }
 
-export default { install }
+ 
