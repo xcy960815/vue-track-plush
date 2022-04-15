@@ -1,5 +1,7 @@
 import 'intersection-observer'
-import request from './fetch'
+import {
+    createRequest
+} from './fetch'
 // 节流时间调整，默认100ms
 IntersectionObserver.prototype['THROTTLE_TIMEOUT'] = 300
 
@@ -52,8 +54,7 @@ export default class Exposure {
                         }
                     }
                 })
-            },
-            {
+            }, {
                 root: null,
                 rootMargin: '0px',
                 threshold: 0.5,

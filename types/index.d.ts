@@ -1,29 +1,38 @@
+import { Vue as _Vue } from "vue"
 
-import { Method } from "axios"
-import Vue from "vue"
+export type Method = 'GET' | 'POST'
 
-type TrackPlushConfig = {
-    projectName?: string,
-    baseURL: string,
+export type TrackPlushConfig = {
+    projectName: string,
+
+    baseURL?: string,
+
     url: string
+
     pageName?: string
+
     pageUrl?: string
+
     userAgent?: Navigator['userAgent']
+
     method?: Method
 }
 
 type ClickEvent = (trackPlushConfig: TrackPlushConfig) => void
 
+declare const clickEvent: ClickEvent
+
 type BrowseEvent = (trackPlushConfig: TrackPlushConfig) => void
 
-type Install = (vue: Vue, trackPlushConfig: TrackPlushConfig) => void
-
-declare const clickEvent: ClickEvent
 declare const browseEvent: BrowseEvent
-declare const install: Install
 
-export { TrackPlushConfig, clickEvent, browseEvent, install }
+export {
+    ClickEvent,
+    BrowseEvent,
+    clickEvent,
+    browseEvent
+}
 
-
-
-
+export default {
+    install(Vue: typeof _Vue, options: TrackPlushConfig): void
+}

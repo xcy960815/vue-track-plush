@@ -1,4 +1,6 @@
-import request from './fetch'
+import {
+    createRequest
+} from './fetch'
 
 // 页面浏览
 export default class Browse {
@@ -8,7 +10,7 @@ export default class Browse {
     // 处理浏览事件
     handleBrowseEvent(entry) {
         if (entry.type === 'customize') {
-            this.track({
+            this.handleSendTrack({
                 pageName: entry.pageName, //页面名称
                 userAgent: this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
                 pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
@@ -18,7 +20,7 @@ export default class Browse {
         } else {
             const trackParams = entry.el.attributes['track-params']
             const pageName = trackParams ? trackParams.value : null
-            this.track({
+            this.handleSendTrack({
                 pageName, //页面名称
                 userAgent: this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
                 pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
@@ -32,8 +34,8 @@ export default class Browse {
      * 事件上报
      * @param {Object} data
      */
-    track(data) {
-        new request({
+    handleSendTrack(data) {
+        createRequest({
             timeout: 10000,
             baseURL: this.trackPlushConfig.baseURL,
             withCredentials: true,

@@ -1,27 +1,25 @@
-import Axios from 'axios'
+export const createRequest = (requestConfig) => {
+    const xhr = new XMLHttpRequest()
+    // 设置请求超时时间
+    xhr.timeout = 10000
 
-export default class Service {
-    constructor(requestConfig) {
-        this.requestConfig = requestConfig || {}
-        this.initRequest()
-    }
-    initRequest() {
-        // 创建实例
-        const service = Axios.create()
-        // 请求拦截
-        // service.interceptors.request.use(
-        //     (config) => {
-        //         return config
-        //     },
-        //     (error) => {
-        //         return Promise.reject(error)
-        //     }
-        // )
-        // 执行实例
-        service(this.requestConfig)
-            .then((res) => {})
-            .catch((error) => {
-                return Promise.reject(error)
-            })
-    }
+    // 设置请求url
+    const url = `${requestConfig.baseUrl ? requestConfig.baseUrl : ""}${requestConfig.url ? requestConfig.url : ""}`
+
+    // 设置请求方法
+    const method = requestConfig.method.toUpperCase() || 'POST'
+
+    // 发起请求
+    xhr.open(method, url, true)
+
+    // 设置请求携带cookie
+    xhr.withCredentials = true
+
+    // 设置content-type
+    xhr.setRequestHeader('Content-type', 'application/json;charset=UTF-8')
+
+    // 发送数据
+    xhr.send(JSON.stringify(requestConfig.data || {}))
+
+
 }
