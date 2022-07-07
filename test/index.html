@@ -20,7 +20,7 @@
     <script src="./index.umd.js"></script>
     <script>
         console.log(VueTrackPlush)
-        Vue.use(VueTrackPlush['default'], { projectName: "项目名称", baseURL: "http://d.daily.vdian.net", url: "/api/action/record" })
+        Vue.use(VueTrackPlush['default'], { projectName: "项目名称", baseURL: "域名", url: "接口地址" })
         new Vue({
             el: '#app',
             template: `<div v-track:browse track-params="页面名称">
