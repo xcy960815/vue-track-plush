@@ -1,8 +1,9 @@
 export const createRequest = (requestConfig) => {
     const xhr = new XMLHttpRequest()
+
     // 设置请求超时时间
     xhr.timeout = 10000
-    console.log('requestConfig---requestConfig', requestConfig);
+
     if (!requestConfig.baseURL || !requestConfig.url) throw new Error("baseUrl属性或者url不能为空!")
 
     // 设置请求url

@@ -1,9 +1,8 @@
 import {
     terser
 } from 'rollup-plugin-terser'
-import babel from 'rollup-plugin-babel'
+import babel from '@rollup/plugin-babel'
 import clear from 'rollup-plugin-delete'
-import serve from 'rollup-plugin-serve'
 import livereload from 'rollup-plugin-livereload'
 
 const isProduction = process.env.NODE_ENV === 'production'
@@ -20,34 +19,26 @@ const initConfig = () => {
                 exports: 'named',
             },
             {
-                file: './test/index.umd.js',
-                format: 'umd',
+                file: './dist/index.esm.js',
+                format: 'esm',
                 name: 'VueTrackPlush',
-                exports: 'named',
             },
         ],
         plugins: [
-            clear({
+            !isDev && clear({
                 targets: ['dist']
             }),
             babel({
-                exclude: 'node_modules/**'
+                exclude: 'node_modules/**',
+                babelHelpers: 'runtime',
+                skipPreflightCheck: true
             }),
             isProduction && terser()
         ]
     }
     if (isDev) {
         config.plugins.push(
-            serve({
-                open: false,
-                host: 'localhost',
-                port: 9999,
-                historyApiFallback: true,
-                contentBase: 'test',
-                headers: {
-                    'Access-Control-Allow-Origin': '*',
-                },
-            }),
+            // 热更新
             livereload()
         )
     }

@@ -1,11 +1,13 @@
 {
     "presets": [
-        
         [
             "env",
             {
-                "modules": false
+                "modules": false,
+                "targets": {
+                    "node": "current" // 根据当前节点版本进行编译
+                }
             }
         ]
-    ] 
+    ]
 }

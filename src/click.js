@@ -9,39 +9,53 @@ export default class Click {
     // 处理点击事件
     handleClickEvent(entry) {
         if (entry.type === 'customize') {
+            // 删掉type属性 type属性 是自用的
+            const currentEntry = JSON.parse(JSON.stringify(entry))
+            delete currentEntry.type
             this.handleSendTrack({
-                buttonName: entry.buttonName,
-                userAgent: this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
-                pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
-                projectName: this.trackPlushConfig.projectName, //项目名称
+                userAgent: this.trackPlushConfig.userAgent || navigator.userAgent,
+                pageUrl: this.trackPlushConfig.pageUrl || window.location.href,
+                projectName: this.trackPlushConfig.projectName,
                 actionType: '点击事件',
+                ...currentEntry
             })
         } else {
-            const trackParams = entry.el.attributes['track-params']
-            const buttonName = trackParams ? trackParams.value : null
+            // 指令埋点上报
             entry.el.addEventListener('click', () => {
-                this.handleSendTrack({
-                    buttonName,
-                    userAgent: this.trackPlushConfig.userAgent || navigator.userAgent, //客户端设备
-                    pageUrl: this.trackPlushConfig.pageUrl || window.location.href, //当前页面路径
-                    projectName: this.trackPlushConfig.projectName, //项目名称
-                    actionType: '点击事件',
-                })
+                // 获取 节点上 track-params 属性的值 在html节点中 属性所对应的值 只能是字符串 不能传递复杂 数据
+                const trackParams = entry.VNode.data.attrs['track-params']
+                if (typeof trackParams == "string") {
+                    // 如果参数是字符串 那这个参数就赋值给buttonName字段
+                    this.handleSendTrack({
+                        buttonName: trackParams,
+                        userAgent: this.trackPlushConfig.userAgent || navigator.userAgent,
+                        pageUrl: this.trackPlushConfig.pageUrl || window.location.href,
+                        projectName: this.trackPlushConfig.projectName,
+                        actionType: '点击事件',
+                    })
+                } else {
+                    this.handleSendTrack({
+                        userAgent: this.trackPlushConfig.userAgent || navigator.userAgent,
+                        pageUrl: this.trackPlushConfig.pageUrl || window.location.href,
+                        projectName: this.trackPlushConfig.projectName,
+                        actionType: '点击事件',
+                        ...trackParams,
+                    })
+                }
+
             })
         }
     }
     /**
      * 事件上报
-     * @param {Object} data
+     * @param {Object} trackParams
      */
-    handleSendTrack(data) {
+    handleSendTrack(trackParams) {
         createRequest({
-            timeout: 10000,
             baseURL: this.trackPlushConfig.baseURL,
-            withCredentials: true,
             url: this.trackPlushConfig.url,
             method: this.trackPlushConfig.method || 'post',
-            data,
+            data: trackParams,
         })
     }
 }

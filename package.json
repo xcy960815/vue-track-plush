@@ -1,13 +1,14 @@
 {
     "name": "vue-track-plush",
-    "version": "1.3.96",
+    "version": "1.4.01",
     "description": "基于vue自定义指令的埋点统计",
     "main": "dist/index.umd.js",
-    "module": "dist/index.umd.js",
+    "module": "dist/index.esm.js",
     "scripts": {
         "dev": "NODE_ENV=development ENV=daily rollup -c -w",
+        "link": "npm link && npm link vue-track-plush",
         "build": "NODE_ENV=production ENV=prod  rollup -c",
-        "upload": "npm run build && npm publish"
+        "serve": "vue-cli-service serve"
     },
     "repository": {
         "type": "git",
@@ -20,19 +21,25 @@
         "vue",
         "track"
     ],
-    "author": "xuchongyu@18763006837@163.com",
+    "author": "xuchongyu",
     "license": "MIT",
     "devDependencies": {
+        "@babel/plugin-transform-runtime": "^7.18.9",
+        "@rollup/plugin-babel": "^5.3.1",
         "@rollup/plugin-commonjs": "^16.0.0",
+        "@vue/cli-service": "^5.0.8",
         "babel-core": "^6.9.1",
         "babel-loader": "^6.2.4",
         "babel-preset-env": "^1.7.0",
+        "less": "^4.1.3",
+        "less-loader": "^11.0.0",
         "rollup": "^2.32.1",
-        "rollup-plugin-babel": "^3.0.7",
         "rollup-plugin-delete": "^2.0.0",
         "rollup-plugin-livereload": "^2.0.0",
         "rollup-plugin-serve": "^1.1.0",
-        "rollup-plugin-terser": "^7.0.2"
+        "rollup-plugin-terser": "^7.0.2",
+        "vue": "^2.5.2",
+        "vue-template-compiler": "^2.5.2"
     },
     "dependencies": {
         "intersection-observer": "^0.11.0"
