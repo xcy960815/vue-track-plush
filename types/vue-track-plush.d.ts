@@ -1,6 +1,5 @@
-import { Vue as _Vue } from "vue"
+import type { VueConstructor } from "vue"
 
-export type Method = 'GET' | 'POST'
 
 export type TrackPlushConfig = {
 
@@ -10,13 +9,6 @@ export type TrackPlushConfig = {
 
     url: string
 
-    pageName?: string
-
-    pageUrl?: string
-
-    userAgent?: Navigator['userAgent']
-
-    method?: Method
 }
 
 export type ClickEvent = (trackPlushConfig: TrackPlushConfig) => void
@@ -27,7 +19,8 @@ export type BrowseEvent = (trackPlushConfig: TrackPlushConfig) => void
 
 export declare const browseEvent: BrowseEvent
 
+export type install = (Vue: VueConstructor, options: TrackPlushConfig) => void
 
 export default {
-    install(Vue: typeof _Vue, options: TrackPlushConfig): void
-}
+    install: install
+};

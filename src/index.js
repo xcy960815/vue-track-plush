@@ -1,50 +1,60 @@
 // import Exposure from './exposure'
+// 曝光
+// else if (item === 'exposure') {
+//     new Exposure(trackPlushConfig).handleExposureEvent({
+//         el,
+//     })
+// }
 import Click from "./click";
 import Browse from "./browse";
 
-// 忽略的字段
-const ignoreField = ["baseURL", "url"];
-
 // 指令 触发
 const install = function (Vue, trackPlushConfig = {}) {
+  const clickInstance = new Click(trackPlushConfig);
+  const browseInstance = new Browse(trackPlushConfig);
   Vue.directive("track", {
     bind(el, binding, VNode) {
-      const { arg } = binding;
-
-      arg.split("|").forEach((item) => {
-        // 点击
-        if (item === "click") {
-          new Click(trackPlushConfig).handleClickEvent({
+      const { arg: handleType } = binding;
+      switch (handleType) {
+        case "click":
+          clickInstance.handleDirectiveClickEvent({
             el,
             VNode,
-            type: "instruction",
           });
-        }
-
-        // 曝光
-        // else if (item === 'exposure') {
-        //     new Exposure(trackPlushConfig).handleExposureEvent({
-        //         el,
-        //     })
-        // }
-
-        // 浏览
-        else if (item === "browse") {
-          new Browse(trackPlushConfig).handleBrowseEvent({
-            el,
+          break;
+        case "browse":
+          browseInstance.handleDirectiveBrowseEvent({
             VNode,
-            type: "instruction",
           });
-        }
-      });
+          break;
+        default:
+          break;
+      }
+    },
+    // 更新的时候
+    update(_el, binding, VNode) {
+      const { arg: handleType } = binding;
+      switch (handleType) {
+        case "click":
+          clickInstance.handleDirectiveClickEvent({
+            el: undefined,
+            VNode,
+          });
+          break;
+        case "browse":
+          browseInstance.handleDirectiveBrowseEvent({
+            VNode,
+          });
+          break;
+        default:
+          break;
+      }
     },
   });
 };
 
-if (typeof window !== "undefined" && window.Vue) {
-  install(window.Vue);
-}
-
+// 忽略的字段
+const ignoreField = ["baseURL", "url"];
 // 点击事件
 export const clickEvent = (trackPlushConfig) => {
   const clickEventParams = {};
@@ -53,10 +63,7 @@ export const clickEvent = (trackPlushConfig) => {
       clickEventParams[key] = trackPlushConfig[key];
   });
 
-  new Click(trackPlushConfig).handleClickEvent({
-    ...clickEventParams,
-    type: "customize",
-  });
+  new Click(trackPlushConfig).handleCustomClickEvent(clickEventParams);
 };
 
 // 浏览事件
@@ -67,10 +74,7 @@ export const browseEvent = (trackPlushConfig) => {
       browseEventParams[key] = trackPlushConfig[key];
   });
 
-  new Browse(trackPlushConfig).handleBrowseEvent({
-    ...browseEventParams,
-    type: "customize",
-  });
+  new Browse(trackPlushConfig).handleCustomBrowseEvent(browseEventParams);
 };
 
 export default {

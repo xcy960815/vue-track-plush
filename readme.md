@@ -1,160 +1,137 @@
 ### vue-track-plush 一个基于 vue2 指令埋点的组件
 
+[![npm](https://img.shields.io/npm/v/vue-track-plush.svg)](https://www.npmjs.com/package/vue-track-plush)
+[![npm](https://img.shields.io/npm/dw/vue-track-plush.svg)](https://npmtrends.com/vue-track-plush)
+[![npm](https://img.shields.io/npm/l/vue-track-plush.svg?sanitize=true)](https://www.npmjs.com/package/vue-track-plush)
+[![vue2](https://img.shields.io/badge/vue-2.x-brightgreen.svg)](https://vuejs.org/)
+
 ### 安装方法
 
 ```sh
 npm install vue-track-plush -S
-
-OR
-
-yarn add vue-track-plush
 ```
 
 字段类型
 
 ```ts
 export type TrackPlushConfig = {
-
-    projectName: string, // 项目名称
-
-    baseURL: string, // 埋点接口baseURL
-
-    url: srting // 埋点接口url
-
-    pageName?: string // 页面名称 自定义浏览事件必填
-
-    pageUrl?: 页面url //页面url 默认 window.location.href
-
-    userAgent?: UA // 默认 navigator.userAgent
-
-    method?: "GET"|"POST" //埋 点接口的请求方法 默认POST
-
-    buttonName?:string // 点击事件的按钮名称
-}
+  projectName: string; // 项目名称
+  baseURL: string; // 埋点接口baseURL
+  url: srting; // 埋点接口url
+};
 ```
 
 ### 使用方法 (指令埋点)
 
 ```js
 // main.js
-import Vue from 'vue'
-import App from './App'
-Vue.config.productionTip = false
+import Vue from "vue";
+import App from "./App";
+Vue.config.productionTip = false;
 // 植入埋点指令
-import VueTrackPlush from "vue-track-plush"
+import VueTrackPlush from "vue-track-plush";
 Vue.use(VueTrackPlush, {
   baseURL: "<接口域名>",
   url: "<接口地址>",
-  projectName: "项目名称"
-})
+  projectName: "项目名称",
+});
 new Vue({
-  el: '#app',
+  el: "#app",
   components: {
-    App
+    App,
   },
-  template: '<App/>'
-})
-
+  template: "<App/>",
+});
 ```
 
 ### 使用方法 (点击埋点)
+
 ```html
 <!-- xxx.vue -->
 <template>
-    <div class="vue-track-plush">
+  <div class="vue-track-plush">
+    <h3>vue-track-plush-demo</h3>
 
-        <h3>vue-track-plush-demo</h3>
-
-        <!-- 测试参数传递对象 -->
-        <div class="button-box" v-track:browse :track-params="{ name: 'testName', pageName: 'pageName' }">
-            <button 
-                v-track:click
-                :track-params="{ 
+    <!-- 测试参数传递对象 -->
+    <!-- 注意 如果自定义指令的参数是对象 则会结构当前的对象数据 进行数据上报  -->
+    <div
+      class="button-box"
+      v-track:browse
+      :track-params="{ name: 'testName', pageName: 'pageName' }"
+    >
+      <!-- 注意如果自定义指令的参数是对象 则会结构当前的对象数据 进行数据上报 -->
+      <button
+        v-track:click
+        :track-params="{ 
                     buttonName: '指令点击上(参数是对象)', 
                     param1: 'param1', 
                     param2: 'param2' 
                 }"
-                >
-                指令点击上报(参数是对象)
-            </button>
-        </div>
-
-        <!-- 测试参数传递字符串 -->
-        <div class="button-box" 
-            v-track:browse 
-            track-params="example"
-        >
-            <button 
-                v-track:click 
-                track-params="指令点击上报(参数是字符串)"
-                >
-                指令点击上报(参数是字符串)
-            </button>
-        </div>
-
-        <div class="button-box">
-            <button 
-                @click="customClickReport">
-                自定义点击上报
-            </button>
-        </div>
-
-        <div class="button-box">
-            <button
-                 @click="customBrowseReport">
-                 自定义浏览上报
-            </button>
-        </div>
-
+      >
+        指令点击上报(参数是对象)
+      </button>
     </div>
+
+    <!-- 测试参数传递字符串 -->
+    <!-- 注意 如果自定义指令的参数是字符串 则会以pageName作为数据上报 -->
+    <div class="button-box" v-track:browse track-params="example">
+      <!-- 注意 如果自定义指令的参数是字符串 则会以buttonName作为数据上报 -->
+      <button v-track:click track-params="指令点击上报(参数是字符串)">
+        指令点击上报(参数是字符串)
+      </button>
+    </div>
+
+    <div class="button-box">
+      <button @click="customClickReport">自定义点击上报</button>
+    </div>
+
+    <div class="button-box">
+      <button @click="customBrowseReport">自定义浏览上报</button>
+    </div>
+  </div>
 </template>
 
 <script>
-// 自定义埋点上报
-import { clickEvent, browseEvent } from "vue-track-plush"
+  // 自定义埋点上报
+  import { clickEvent, browseEvent } from "vue-track-plush";
 
-export default {
+  export default {
     data() {
-        return {};
+      return {};
     },
-    mounted() { },
+    mounted() {},
     methods: {
-        // 自定义点击上报
-        customClickReport() {
-            clickEvent({
-                baseURL: "<接口域名>",
-                url: "<接口地址>",
-                projectName:"项目名称",
-                buttonName: "按钮名称",
-                param1: "参数1",
-                param2: "参数2",
-                paramN: "参数n"
-            })
-        },
-        // 自定义浏览上班
-        customBrowseReport() {
-            browseEvent({
-                baseURL: "<接口域名>",
-                url: "<接口地址>",
-                projectName:"项目名称",
-                pageName: "页面名称",
-                param1: "参数1",
-                param2: "参数2",
-                paramN: "参数n"
-            })
-        }
+      // 自定义点击上报
+      customClickReport() {
+        clickEvent({
+          baseURL: "<接口域名>",
+          url: "<接口地址>",
+          projectName: "项目名称",
+          buttonName: "按钮名称",
+          param1: "参数1",
+          param2: "参数2",
+          paramN: "参数n",
+        });
+      },
+      // 自定义浏览上班
+      customBrowseReport() {
+        browseEvent({
+          baseURL: "<接口域名>",
+          url: "<接口地址>",
+          projectName: "项目名称",
+          pageName: "页面名称",
+          param1: "参数1",
+          param2: "参数2",
+          paramN: "参数n",
+        });
+      },
     },
-};
+  };
 </script>
 
 <style scoped lang="less">
-.button-box {
+  .button-box {
     margin-bottom: 10px;
-}
+  }
 </style>
-
 ```
-
-#### TODO
-    1. 现在通过 点击事件 [v-track:click] track-params="参数" 的情况还不支持 动态参数上传 可用自定义点击埋点指令 「 clickEvent 」 代替 
-    2. 现在通过 浏览事件 [v-track:browse] track-params="参数" 的情况还不支持 动态参数上传 可用自定义点击埋点指令 「 browseEvent 」 代替 

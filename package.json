@@ -2,8 +2,8 @@
     "name": "vue-track-plush",
     "version": "1.4.2",
     "description": "基于vue自定义指令的埋点统计",
-    "main": "dist/index.umd.js",
-    "module": "dist/index.esm.js",
+    "main": "dist/vue-track-plush.umd.js",
+    "module": "dist/vue-track-plush.esm.js",
     "scripts": {
         "dev": "NODE_ENV=development ENV=daily rollup -c -w",
         "link": "npm link && npm link vue-track-plush",
@@ -12,16 +12,19 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/ChongYu-Yease/vue-track-plush"
+        "url": "https://github.com/xcy19960815/vue-track-plush"
     },
-    "types": "./types/index.d.ts",
+    "types": "./types/vue-track-plush.d.ts",
     "keywords": [
         "vue-track",
         "vue-track-plush",
         "vue",
         "track"
     ],
-    "author": "xuchongyu",
+    "author": {
+        "name": "xcy19960815",
+        "email": "18763006837@163.com"
+    },
     "license": "MIT",
     "devDependencies": {
         "@babel/plugin-transform-runtime": "^7.18.9",
