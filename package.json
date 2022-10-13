@@ -1,6 +1,6 @@
 {
     "name": "vue-track-plush",
-    "version": "1.4.4",
+    "version": "2.0.0",
     "description": "基于vue自定义指令的埋点统计",
     "main": "dist/vue-track-plush.umd.js",
     "module": "dist/vue-track-plush.esm.js",
