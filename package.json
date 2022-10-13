@@ -1,6 +1,6 @@
 {
     "name": "vue-track-plush",
-    "version": "1.4.3",
+    "version": "1.4.4",
     "description": "基于vue自定义指令的埋点统计",
     "main": "dist/vue-track-plush.umd.js",
     "module": "dist/vue-track-plush.esm.js",
@@ -12,7 +12,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/xcy19960815/vue-track-plush"
+        "url": "https://github.com/xcy960815/vue-track-plush"
     },
     "types": "./types/vue-track-plush.d.ts",
     "keywords": [
@@ -26,6 +26,9 @@
         "email": "18763006837@163.com"
     },
     "license": "MIT",
+    "peerDependencies": {
+        "vue": "^2.6.10"
+    },
     "devDependencies": {
         "@babel/plugin-transform-runtime": "^7.18.9",
         "@rollup/plugin-babel": "^5.3.1",

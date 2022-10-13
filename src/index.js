@@ -32,24 +32,24 @@ const install = function (Vue, trackPlushConfig = {}) {
       }
     },
     // 更新的时候
-    update(_el, binding, VNode) {
-      const { arg: handleType } = binding;
-      switch (handleType) {
-        case "click":
-          clickInstance.handleDirectiveClickEvent({
-            el: undefined,
-            VNode,
-          });
-          break;
-        case "browse":
-          browseInstance.handleDirectiveBrowseEvent({
-            VNode,
-          });
-          break;
-        default:
-          break;
-      }
-    },
+    // update(_el, binding, VNode) {
+    //   const { arg: handleType } = binding;
+    //   switch (handleType) {
+    //     case "click":
+    //       clickInstance.handleDirectiveClickEvent({
+    //         el: undefined,
+    //         VNode,
+    //       });
+    //       break;
+    //     case "browse":
+    //       browseInstance.handleDirectiveBrowseEvent({
+    //         VNode,
+    //       });
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // },
   });
 };
 
