@@ -13,18 +13,18 @@ const install = function (Vue, trackPlushConfig = {}) {
   const clickInstance = new Click(trackPlushConfig);
   const browseInstance = new Browse(trackPlushConfig);
   Vue.directive("track", {
-    bind(el, binding, VNode) {
+    bind(el, binding) {
       const { arg: handleType } = binding;
       switch (handleType) {
         case "click":
           clickInstance.handleDirectiveClickEvent({
             el,
-            VNode,
+            binding,
           });
           break;
         case "browse":
           browseInstance.handleDirectiveBrowseEvent({
-            VNode,
+            binding,
           });
           break;
         default:
@@ -32,24 +32,25 @@ const install = function (Vue, trackPlushConfig = {}) {
       }
     },
     // 更新的时候
-    // update(_el, binding, VNode) {
-    //   const { arg: handleType } = binding;
-    //   switch (handleType) {
-    //     case "click":
-    //       clickInstance.handleDirectiveClickEvent({
-    //         el: undefined,
-    //         VNode,
-    //       });
-    //       break;
-    //     case "browse":
-    //       browseInstance.handleDirectiveBrowseEvent({
-    //         VNode,
-    //       });
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // },
+    update(_el, binding) {
+      const { arg: handleType, value, oldValue } = binding;
+      if (JSON.stringify(value) !== JSON.stringify(oldValue)) {
+        switch (handleType) {
+          case "click":
+            clickInstance.handleDirectiveClickEvent({
+              binding,
+            });
+            break;
+          case "browse":
+            browseInstance.handleDirectiveBrowseEvent({
+              binding,
+            });
+            break;
+          default:
+            break;
+        }
+      }
+    },
   });
 };
 

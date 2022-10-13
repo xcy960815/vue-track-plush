@@ -56,17 +56,15 @@ new Vue({
     <!-- 注意 如果自定义指令的参数是对象 则会结构当前的对象数据 进行数据上报  -->
     <div
       class="button-box"
-      v-track:browse
-      :track-params="{ name: 'testName', pageName: 'pageName' }"
+      v-track:browse="{ name: 'testName', pageName: 'pageName' }"
     >
       <!-- 注意如果自定义指令的参数是对象 则会结构当前的对象数据 进行数据上报 -->
       <button
-        v-track:click
-        :track-params="{ 
-                    buttonName: '指令点击上(参数是对象)', 
-                    param1: 'param1', 
-                    param2: 'param2' 
-                }"
+        v-track:click="{ 
+              buttonName: '指令点击上(参数是对象)', 
+              param1: 'param1', 
+              param2: 'param2' 
+          }"
       >
         指令点击上报(参数是对象)
       </button>
@@ -74,9 +72,9 @@ new Vue({
 
     <!-- 测试参数传递字符串 -->
     <!-- 注意 如果自定义指令的参数是字符串 则会以pageName作为数据上报 -->
-    <div class="button-box" v-track:browse track-params="example">
+    <div class="button-box" v-track:browse="example">
       <!-- 注意 如果自定义指令的参数是字符串 则会以buttonName作为数据上报 -->
-      <button v-track:click track-params="指令点击上报(参数是字符串)">
+      <button v-track:click="指令点击上报(参数是字符串)">
         指令点击上报(参数是字符串)
       </button>
     </div>
@@ -88,6 +86,31 @@ new Vue({
     <div class="button-box">
       <button @click="customBrowseReport">自定义浏览上报</button>
     </div>
+    <!-- 测试动态数据上报 -->
+    <div class="button-box">
+      <button @click="clickNumber++">动态修改上报数据</button> ===》{{
+      clickNumber }}
+      <button
+        v-track:click="{
+          buttonName: '点击的上报数据',
+          currentNunber: clickNumber,
+        }"
+      >
+        上报点击数据
+      </button>
+    </div>
+    <div class="button-box">
+      <button @click="browseNumber++">动态修改上报数据</button> ===》 {{
+      browseNumber }}
+      <button
+        v-track:browse="{
+          buttonName: '浏览的上报数据',
+          currentNunber: browseNumber,
+        }"
+      >
+        上报浏览数据
+      </button>
+    </div>
   </div>
 </template>
 
@@ -97,7 +120,12 @@ new Vue({
 
   export default {
     data() {
-      return {};
+      return {
+        clickNumber: 0,
+        browseNumber: 0,
+        clickTrackParams: "click-track-params-before",
+        browseTrackParams: "browse-track-params-before",
+      };
     },
     mounted() {},
     methods: {

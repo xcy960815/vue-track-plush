@@ -15,8 +15,8 @@ export default class Browse {
   }
   // 处理浏览事件
   handleDirectiveBrowseEvent(trackParams) {
-    const { VNode } = trackParams;
-    this.trackParams = VNode.data.attrs["track-params"];
+    const { binding } = trackParams;
+    this.trackParams = binding.value;
     // 指令埋点上报
     this.handleSendTrack(
       typeof this.trackParams == "string"

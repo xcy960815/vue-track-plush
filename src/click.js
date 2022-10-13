@@ -16,8 +16,8 @@ export default class Click {
 
   // 处理指令点击事件
   handleDirectiveClickEvent(trackParams) {
-    const { el, VNode } = trackParams;
-    this.trackParams = VNode.data.attrs["track-params"];
+    const { el, binding } = trackParams;
+    this.trackParams = binding.value;
     if (!!el) {
       el.addEventListener("click", () => {
         this.handleSendTrack(
