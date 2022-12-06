@@ -5,79 +5,102 @@
 //         el,
 //     })
 // }
+// noinspection JSUnusedGlobalSymbols
+
 import Click from "./click";
+
 import Browse from "./browse";
 
 // 指令 触发
-const install = function (Vue, trackPlushConfig = {}) {
-  const clickInstance = new Click(trackPlushConfig);
-  const browseInstance = new Browse(trackPlushConfig);
-  Vue.directive("track", {
-    bind(el, binding) {
-      const { arg: handleType } = binding;
-      switch (handleType) {
-        case "click":
-          clickInstance.handleDirectiveClickEvent({
-            el,
-            binding,
-          });
-          break;
-        case "browse":
-          browseInstance.handleDirectiveBrowseEvent({
-            binding,
-          });
-          break;
-        default:
-          break;
-      }
-    },
-    // 更新的时候
-    update(_el, binding) {
-      const { arg: handleType, value, oldValue } = binding;
-      if (JSON.stringify(value) !== JSON.stringify(oldValue)) {
+export default class VueTrackPlush {
+  #clickInstance;
+
+  #browserInstance;
+  static install(Vue, trackConfig = {}) {
+    VueTrackPlush.prototype.clickInstance = Click.getInstance(trackConfig);
+
+    VueTrackPlush.prototype.browserInstance = Browse.getInstance(trackConfig);
+
+    Vue.directive("track", {
+      bind(el, binding) {
+        const { arg: handleType, value: trackParams } = binding;
         switch (handleType) {
           case "click":
-            clickInstance.handleDirectiveClickEvent({
-              binding,
+            // 绑定点击事件
+            VueTrackPlush.prototype.clickInstance.handleAddClickEvent({
+              el,
+              trackParams,
             });
             break;
           case "browse":
-            browseInstance.handleDirectiveBrowseEvent({
-              binding,
-            });
+            VueTrackPlush.prototype.browserInstance.handleBrowseEvent(
+              trackParams
+            );
             break;
+          // 曝光埋点
+          // case 'exposure':
+          //     Vue3TrackPlush.prototype.exposureInstance.handleExposureEvent({
+          //         el,
+          //         trackParams,
+          //     })
           default:
             break;
         }
-      }
-    },
-  });
-};
+      },
+      // 更新的时候
+      update(el, binding) {
+        const { arg: trackType, value, oldValue } = binding;
+        if (JSON.stringify(value) !== JSON.stringify(oldValue)) {
+          switch (trackType) {
+            case "click":
+              // 移除点击事件
+              VueTrackPlush.prototype.clickInstance.handleRemoveClickEvent(el);
+              // 绑定点击事件
+              VueTrackPlush.prototype.clickInstance.handleAddClickEvent({
+                el,
+                trackParams: value,
+              });
+              break;
+            case "browse":
+              VueTrackPlush.prototype.browserInstance.handleBrowseEvent(value);
+              break;
+            // 曝光埋点
+            // case 'exposure':
+            //     Vue3TrackPlush.prototype.exposureInstance.handleExposureEvent({
+            //         el,
+            //         trackParams,
+            //     })
+            default:
+              break;
+          }
+        }
+      },
+    });
+  }
+}
 
-// 忽略的字段
-const ignoreField = ["baseURL", "url"];
 // 点击事件
-export const clickEvent = (trackPlushConfig) => {
-  const clickEventParams = {};
-  Object.keys(trackPlushConfig).forEach((key) => {
-    if (!ignoreField.includes(key))
-      clickEventParams[key] = trackPlushConfig[key];
+export const clickEvent = (trackConfig) => {
+  const clickInstance = new Click(trackConfig);
+  const trackParams = {};
+  Object.keys(trackConfig).forEach((key) => {
+    if (!["baseURL", "url", "projectName"].includes(key)) {
+      const value = trackConfig[key];
+      trackParams[key] = value;
+    }
   });
-
-  new Click(trackPlushConfig).handleCustomClickEvent(clickEventParams);
+  clickInstance.handleSendTrack(trackParams);
 };
 
 // 浏览事件
-export const browseEvent = (trackPlushConfig) => {
-  const browseEventParams = {};
-  Object.keys(trackPlushConfig).forEach((key) => {
-    if (!ignoreField.includes(key))
-      browseEventParams[key] = trackPlushConfig[key];
+export const browseEvent = (trackConfig) => {
+  const browserInstance = new Browse(trackConfig);
+  const trackParams = {};
+  Object.keys(trackConfig).forEach((key) => {
+    if (!["baseURL", "url", "projectName"].includes(key)) {
+      const value = trackConfig[key];
+      trackParams[key] = value;
+    }
   });
-
-  new Browse(trackPlushConfig).handleCustomBrowseEvent(browseEventParams);
-};
-
-export default {
-  install,
+  browserInstance.handleSendTrack(trackParams);
 };

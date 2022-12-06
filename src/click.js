@@ -2,41 +2,58 @@ import { createRequest } from "./fetch";
 
 export default class Click {
   // 初始化配置
-  trackPlushConfig = {
+  trackConfig = {
     baseURL: "",
     url: "",
     projectName: "",
   };
+
   trackParams = null;
-  constructor(trackPlushConfig) {
-    this.trackPlushConfig.baseURL = trackPlushConfig.baseURL;
-    this.trackPlushConfig.url = trackPlushConfig.url;
-    this.trackPlushConfig.projectName = trackPlushConfig.projectName;
-  }
 
-  // 处理指令点击事件
-  handleDirectiveClickEvent(trackParams) {
-    const { el, binding } = trackParams;
-    this.trackParams = binding.value;
-    if (!!el) {
-      el.addEventListener("click", () => {
-        this.handleSendTrack(
-          typeof this.trackParams == "string"
-            ? {
-                buttonName: this.trackParams,
-              }
-            : this.trackParams
-        );
-      });
+  static instance;
+
+  static getInstance(trackConfig) {
+    if (!this.instance) {
+      this.instance = new Click(trackConfig);
     }
+    return this.instance;
   }
 
-  // 处理点击事件
-  handleCustomClickEvent(trackParams) {
-    this.handleSendTrack(trackParams);
+  constructor(trackConfig) {
+    this.trackConfig = trackConfig;
+  }
+
+  /**
+   * @description 添加点击事件
+   * @returns {void}
+   */
+  handleAddClickEvent(params) {
+    const { el, trackParams } = params;
+    this.trackParams = trackParams;
+    el.addEventListener("click", this.handleClickEvent);
   }
   /**
-   * 事件上报
+   * @description 移出点击事件
+   * @returns {void}
+   */
+  handleRemoveClickEvent(el) {
+    el.removeEventListener("click", this.handleClickEvent);
+  }
+
+  /**
+   * @desc 处理指令点击事件
+   * @param {{ el: HTMLElement  }} params
+   */
+  handleClickEvent = () => {
+    this.handleSendTrack(
+      typeof this.trackParams == "object"
+        ? this.trackParams
+        : { buttonName: this.trackParams }
+    );
+  };
+
+  /**
+   * @desc 事件上报
    * @param {Object} trackParams
    */
   handleSendTrack(trackParams) {
@@ -45,14 +62,14 @@ export default class Click {
         userAgent: navigator.userAgent,
         pageUrl: window.location.href,
         actionType: "点击事件",
-        projectName: this.trackPlushConfig.projectName,
+        projectName: this.trackConfig.projectName,
       },
       trackParams
     );
 
     createRequest({
-      baseURL: this.trackPlushConfig.baseURL,
-      url: this.trackPlushConfig.url,
+      baseURL: this.trackConfig.baseURL,
+      url: this.trackConfig.url,
       data: requestParams,
     });
   }

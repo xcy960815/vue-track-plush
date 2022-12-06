@@ -2,34 +2,25 @@ import { createRequest } from "./fetch";
 
 // 页面浏览
 export default class Browse {
-  trackPlushConfig = {
-    baseURL: "",
-    url: "",
-    projectName: "",
-  };
-  trackParams = null;
-  constructor(trackPlushConfig) {
-    this.trackPlushConfig.baseURL = trackPlushConfig.baseURL;
-    this.trackPlushConfig.url = trackPlushConfig.url;
-    this.trackPlushConfig.projectName = trackPlushConfig.projectName;
-  }
-  // 处理浏览事件
-  handleDirectiveBrowseEvent(trackParams) {
-    const { binding } = trackParams;
-    this.trackParams = binding.value;
-    // 指令埋点上报
-    this.handleSendTrack(
-      typeof this.trackParams == "string"
-        ? {
-            // 如果参数类型是字符串 那就是 页面名称
-            pageName: this.trackParams,
-          }
-        : this.trackParams
-    );
+  trackConfig;
+
+  static instance;
+
+  static getInstance(trackConfig) {
+    if (!this.instance) {
+      this.instance = new Browse(trackConfig);
+    }
+    return this.instance;
   }
 
-  handleCustomBrowseEvent(trackParams) {
-    this.handleSendTrack(trackParams);
+  constructor(trackConfig) {
+    this.trackConfig = trackConfig;
+  }
+  // 处理浏览事件
+  handleBrowseEvent(trackParams) {
+    this.handleSendTrack(
+      typeof trackParams === "object" ? trackParams : { pageName: trackParams }
+    );
   }
   /**
    * 事件上报
@@ -41,14 +32,14 @@ export default class Browse {
         userAgent: navigator.userAgent,
         pageUrl: window.location.href,
         actionType: "浏览事件",
-        projectName: this.trackPlushConfig.projectName,
+        projectName: this.trackConfig.projectName,
       },
       trackParams
     );
 
     createRequest({
-      baseURL: this.trackPlushConfig.baseURL,
-      url: this.trackPlushConfig.url,
+      baseURL: this.trackConfig.baseURL,
+      url: this.trackConfig.url,
       data: requestParams,
     });
   }

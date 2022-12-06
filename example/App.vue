@@ -1,58 +1,63 @@
 <template>
   <div class="vue-track-plush">
-    <h3>vue-track-plush-demo</h3>
-    <!-- 测试参数传递对象 -->
-    <div
-      class="button-box"
-      v-track:browse="{ name: 'testName', pageName: 'pageName' }"
-    >
-      <button
-        v-track:click="{
-          buttonName: '指令点击上报(参数是对象)',
-          param1: 'param1',
-          param2: 'param2',
-        }"
-      >
-        指令点击上报(参数是对象)
-      </button>
-    </div>
-    <!-- 测试参数传递字符串 -->
-    <div class="button-box" v-track:browse :track-params="browseTrackParams">
-      <button v-track:click="clickTrackParams">
-        指令点击上报(参数是字符串)
-      </button>
-    </div>
-    <div class="button-box">
-      <button @click="customClickReport">自定义点击上报</button>
-    </div>
-    <div class="button-box">
-      <button @click="customBrowseReport">自定义浏览上报</button>
-    </div>
-    <!-- 测试动态数据上报 -->
-    <div class="button-box">
-      <button @click="clickNumber++">动态修改上报数据</button> ===》{{
-        clickNumber
-      }}
-      <button
-        v-track:click="{
-          buttonName: '点击的上报数据',
-          currentNunber: clickNumber,
-        }"
-      >
-        上报点击数据
-      </button>
-    </div>
-    <div class="button-box">
-      <button @click="browseNumber++">动态修改上报数据</button> ===》
-      {{ browseNumber }}
-      <button
-        v-track:browse="{
-          buttonName: '浏览的上报数据',
-          currentNunber: browseNumber,
-        }"
-      >
-        上报浏览数据
-      </button>
+    <h2 align="center">vue-track-plush 测试demo</h2>
+    <div class="container">
+      <div class="container-item">
+        <h3 align="center">上报静态数据</h3>
+        <h3>测试参数传递对象</h3>
+        <div class="button-box" v-track:browse="{ pageName: '页面名称' }">
+          <button v-track:click="{ buttonName: '按钮名称' }">
+            指令点击上报(参数是对象)
+          </button>
+        </div>
+        <h3>测试参数传递字符串</h3>
+        <div class="button-box" v-track:browse="'页面名称'">
+          <button v-track:click="'按钮名称'">指令点击上报(参数是字符串)</button>
+        </div>
+      </div>
+      <div class="container-item">
+        <h3 align="center">上报动态数据</h3>
+        <h3>测试点击动态数据上报</h3>
+        <div class="button-box">
+          <button @click="clickParams++">动态修改上报点击数据</button> ===》{{
+            clickParams
+          }}
+          <button
+            v-track:click="{
+              buttonName: '点击的上报数据',
+              currentNumber: clickParams,
+            }"
+          >
+            上报点击数据
+          </button>
+        </div>
+        <h3>测试浏览动态数据上报</h3>
+        <div class="button-box">
+          <button @click="browseParams++">动态修改浏览上报数据</button> ===》
+          {{ browseParams }}
+          <button
+            v-track:browse="{
+              buttonName: '浏览的上报数据',
+              currentNumber: browseParams,
+            }"
+          >
+            上报浏览数据
+          </button>
+        </div>
+      </div>
+      <div class="container-item">
+        <h3 align="center">自定义上报数据</h3>
+        <h3>自定义点击上报</h3>
+        <div class="button-box">
+          <button @click="customClickReport">自定义点击上报</button>
+          {{ clickNumber }}
+        </div>
+        <h3>自定义浏览上报</h3>
+        <div class="button-box">
+          <button @click="customBrowseReport">自定义浏览上报</button>
+          {{ browseNumber }}
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -64,49 +69,73 @@ import { clickEvent, browseEvent } from "vue-track-plush";
 export default {
   data() {
     return {
+      browseParams: 0,
+      clickParams: 0,
       clickNumber: 0,
       browseNumber: 0,
-      clickTrackParams: "click-track-params-before",
-      browseTrackParams: "browse-track-params-before",
     };
   },
-  mounted() {
-    // setTimeout(() => {
-    //   this.clickTrackParams = "click-track-params-after";
-    //   this.browseTrackParams = "browse-track-params-after";
-    // }, 3000);
-  },
+
   methods: {
     // 自定义点击上报
     customClickReport() {
       clickEvent({
-        baseURL: "http://d.daily.vdian.net",
+        baseURL: "host",
         url: "/api/action/record",
         projectName: "测试开发",
         buttonName: "按钮名称",
         param1: "参数1",
         param2: "参数2",
         paramN: "参数n",
+        clickNumber: this.clickNumber,
       });
+      this.clickNumber++;
     },
     // 自定义浏览上报
     customBrowseReport() {
       browseEvent({
-        baseURL: "http://d.daily.vdian.net",
+        baseURL: "host",
         url: "/api/action/record",
         projectName: "测试开发",
         pageName: "页面名称",
         param1: "参数1",
         param2: "参数2",
         paramN: "参数n",
+        browseNumber: this.browseNumber,
       });
+      this.browseNumber++;
     },
   },
 };
 </script>
 
 <style scoped lang="less">
-.button-box {
-  margin-bottom: 10px;
+.container {
+  display: flex;
+  .container-item {
+    padding: 10px 20px;
+    flex: 1;
+    margin: 0 20px;
+    .button-box {
+      margin-bottom: 10px;
+      background-color: aqua;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      button {
+        margin: 0 10px;
+      }
+    }
+    &.container-item:nth-child(1) {
+      background-color: bisque;
+    }
+    &.container-item:nth-child(2) {
+      background-color: burlywood;
+    }
+    &.container-item:nth-child(3) {
+      background-color: cadetblue;
+    }
+  }
 }
 </style>
