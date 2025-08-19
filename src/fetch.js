@@ -1,28 +1,65 @@
 export const createRequest = (requestConfig) => {
-    const xhr = new XMLHttpRequest()
+    const {
+        baseURL,
+        url: path,
+        method = 'POST',
+        data,
+        withCredentials = true,
+        timeout = 10000,
+        headers = {},
+        onSuccess,
+        onError,
+        retry = 0,
+        retryDelay = 300
+    } = requestConfig || {}
 
-    // 设置请求超时时间
-    xhr.timeout = 10000
+    if (!baseURL || !path) throw new Error("baseUrl属性或者url不能为空!")
 
-    if (!requestConfig.baseURL || !requestConfig.url) throw new Error("baseUrl属性或者url不能为空!")
+    const url = `${baseURL || ""}${path || ""}`
+    const methodUpper = (method || 'POST').toUpperCase()
 
-    // 设置请求url
-    const url = `${requestConfig.baseURL ? requestConfig.baseURL : ""}${requestConfig.url ? requestConfig.url : ""}`
+    const attempt = (left) => {
+        const xhr = new XMLHttpRequest()
+        xhr.timeout = timeout
+        xhr.open(methodUpper, url, true)
+        xhr.withCredentials = !!withCredentials
+        xhr.setRequestHeader('Content-type', 'application/json;charset=UTF-8')
+        // 自定义 headers
+        Object.keys(headers || {}).forEach(k => {
+            try { xhr.setRequestHeader(k, headers[k]) } catch (e) {}
+        })
 
-    // 设置请求方法
-    const method = requestConfig.method.toUpperCase() || 'POST'
+        xhr.onreadystatechange = () => {
+            if (xhr.readyState === 4) {
+                const ok = xhr.status >= 200 && xhr.status < 300
+                if (ok) {
+                    onSuccess && onSuccess(xhr)
+                } else if (left > 0) {
+                    setTimeout(() => attempt(left - 1), retryDelay)
+                } else {
+                    onError && onError(xhr)
+                }
+            }
+        }
 
-    // 发起请求
-    xhr.open(method, url, true)
+        xhr.onerror = () => {
+            if (left > 0) {
+                setTimeout(() => attempt(left - 1), retryDelay)
+            } else {
+                onError && onError(xhr)
+            }
+        }
 
-    // 设置请求携带cookie
-    xhr.withCredentials = true
+        xhr.ontimeout = () => {
+            if (left > 0) {
+                setTimeout(() => attempt(left - 1), retryDelay)
+            } else {
+                onError && onError(xhr)
+            }
+        }
 
-    // 设置content-type
-    xhr.setRequestHeader('Content-type', 'application/json;charset=UTF-8')
+        xhr.send(JSON.stringify(data || {}))
+    }
 
-    // 发送数据
-    xhr.send(JSON.stringify(requestConfig.data || {}))
-
-
+    attempt(retry)
 }

@@ -31,7 +31,7 @@ export default class Exposure {
                     // 出现在视窗中
                     if (entry.isIntersecting) {
                         // 清除当前定时器
-                        clearInterval(this._timer)
+                        clearInterval(self._timer)
                         const trackParams =
                             entry.target.attributes['track-params']
                         // 获取参数
@@ -67,24 +67,41 @@ export default class Exposure {
      * @param {Element} entry
      */
     handleExposureEvent(entry) {
-        this._observer && this._observer.observe(entry.el)
+        if (!this._observer) return
+        // 支持以字符串或对象形式传递 track-params
+        const attrs = entry && entry.el && entry.el.attributes
+        if (attrs && !attrs['track-params'] && entry.el.__vtpTrackParams) {
+            // 为了在 observer 回调中可读取到值，临时写入 attribute
+            try {
+                const v = typeof entry.el.__vtpTrackParams === 'string' ? entry.el.__vtpTrackParams : JSON.stringify(entry.el.__vtpTrackParams)
+                entry.el.setAttribute('track-params', v)
+            } catch (e) {}
+        }
+        this._observer.observe(entry.el)
     }
     /**
      * 埋点上报
      */
     track() {
         const data = this.cacheDataArr.splice(0, this.maxNum)
-        // track(data)
-        // new request({
-        //     timeout: 10000,
-        //     baseURL: this.trackPlushConfig.baseURL,
-        //     withCredentials: true,
-        //     url: this.trackPlushConfig.url,
-        //     method: this.trackPlushConfig.method || 'post',
-        //     data,
-        // })
-        // 更新localStoragee
-        // this.storeIntoLocalStorage(this.cacheDataArr)
+        if (!data || data.length === 0) return
+        // 按批次上报曝光事件
+        createRequest({
+            timeout: 10000,
+            baseURL: this.trackPlushConfig.baseURL,
+            withCredentials: true,
+            url: this.trackPlushConfig.url,
+            method: this.trackPlushConfig.method || 'post',
+            data: {
+                actionType: '曝光事件',
+                projectName: this.trackPlushConfig.projectName,
+                userAgent: this.trackPlushConfig.userAgent || navigator.userAgent,
+                pageUrl: this.trackPlushConfig.pageUrl || window.location.href,
+                list: data
+            },
+        })
+        // 更新localStorage
+        this.storeIntoLocalStorage(this.cacheDataArr)
     }
 
     /**
@@ -92,17 +109,26 @@ export default class Exposure {
      * @param { Arrary } data
      */
     storeIntoLocalStorage(data) {
-        window.localStorage.setItem('cacheTrackData', data)
+        try {
+            window.localStorage.setItem('cacheTrackData', JSON.stringify(data || []))
+        } catch (e) {}
     }
 
     /**
      * 首次进入先获取localStorage中的数据，也就是用户上次退出未上报的数据
      */
     trackFromLocalStorage() {
-        const cacheData = window.localStorage.getItem('cacheTrackData')
-        if (cacheData) {
-            track(cacheData)
-        }
+        try {
+            const cacheData = window.localStorage.getItem('cacheTrackData')
+            if (cacheData) {
+                const list = JSON.parse(cacheData)
+                if (Array.isArray(list) && list.length > 0) {
+                    this.cacheDataArr.push(...list)
+                    this.track()
+                    window.localStorage.removeItem('cacheTrackData')
+                }
+            }
+        } catch (e) {}
     }
 
     /**

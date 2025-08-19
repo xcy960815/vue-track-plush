@@ -1,4 +1,4 @@
-// import Exposure from './exposure'
+import Exposure from './exposure'
 import Click from "./click";
 import Browse from "./browse";
 
@@ -11,25 +11,27 @@ const install = function (Vue, trackPlushConfig = {}) {
     bind(el, binding, VNode) {
       const { arg } = binding;
 
-      arg.split("|").forEach((item) => {
-        // 点击
+      // 初始化并缓存当前 track-params（支持对象/字符串）
+      const attrs = (VNode && VNode.data && VNode.data.attrs) || {};
+      el.__vtpTrackParams = attrs['track-params'] !== undefined
+        ? attrs['track-params']
+        : (el.getAttribute && el.getAttribute('track-params'));
+      el.__vtpPrevTrackParamsString = typeof el.__vtpTrackParams === 'string'
+        ? el.__vtpTrackParams
+        : JSON.stringify(el.__vtpTrackParams || '');
+
+      (arg || '').split("|").forEach((item) => {
         if (item === "click") {
           new Click(trackPlushConfig).handleClickEvent({
             el,
             VNode,
             type: "instruction",
           });
-        }
-
-        // 曝光
-        // else if (item === 'exposure') {
-        //     new Exposure(trackPlushConfig).handleExposureEvent({
-        //         el,
-        //     })
-        // }
-
-        // 浏览
-        else if (item === "browse") {
+        } else if (item === 'exposure') {
+          new Exposure(trackPlushConfig).handleExposureEvent({
+            el,
+          })
+        } else if (item === "browse") {
           new Browse(trackPlushConfig).handleBrowseEvent({
             el,
             VNode,
@@ -38,6 +40,34 @@ const install = function (Vue, trackPlushConfig = {}) {
         }
       });
     },
+    update(el, binding, VNode) {
+      const { arg } = binding;
+      const attrs = (VNode && VNode.data && VNode.data.attrs) || {};
+      const next = attrs['track-params'] !== undefined
+        ? attrs['track-params']
+        : (el.getAttribute && el.getAttribute('track-params'));
+
+      const prevStr = el.__vtpPrevTrackParamsString;
+      const nextStr = typeof next === 'string' ? next : JSON.stringify(next || '');
+
+      // 覆盖为最新值，供 click/曝光读取
+      el.__vtpTrackParams = next;
+      el.__vtpPrevTrackParamsString = nextStr;
+
+      // 对于浏览事件，当参数发生变化时重新上报一次
+      if ((arg || '').split('|').includes('browse') && nextStr !== prevStr) {
+        new Browse(trackPlushConfig).handleBrowseEvent({
+          el,
+          VNode,
+          type: 'instruction',
+        })
+      }
+    },
+    unbind(el) {
+      // 清理缓存字段
+      delete el.__vtpTrackParams
+      delete el.__vtpPrevTrackParamsString
+    }
   });
 };
 

@@ -9,7 +9,9 @@ export type TrackPlushConfig = {
     pageName?: string,
     pageUrl?: string,
     userAgent?: Navigator['userAgent'],
-    method?: Method
+    method?: Method,
+    buttonName?: string,
+    [key: string]: any
 }
 
 export type ClickEvent = (trackPlushConfig: TrackPlushConfig) => void
@@ -21,7 +23,7 @@ export type BrowseEvent = (trackPlushConfig: TrackPlushConfig) => void
 export declare const browseEvent: BrowseEvent
 
 declare const _default: {
-    install(Vue: VueConstructor, options: TrackPlushConfig): void
+    install(Vue: VueConstructor, options?: Partial<TrackPlushConfig>): void
 }
 
 export default _default
