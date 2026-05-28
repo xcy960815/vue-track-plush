@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noImplicitAny": false,
+    "removeComments": true,
+    "esModuleInterop": true,
+    "target": "ES2015",
+    "lib": ["ESNext", "DOM"],
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "declarationDir": "./temp",
+    "noEmit": true,
+    "strict": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@plugin/*": ["./plugin/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.vue", "plugin/**/*.ts"],
+  "files": ["src/shims-vue.d.ts"]
+}
