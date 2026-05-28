@@ -12,11 +12,8 @@
   ],
   "scripts": {
     "dev": "vite",
-    "serve": "vite",
     "dev:plugin": "vite build --config vite.plugin.config.ts --watch",
-    "build": "pnpm build:plugin",
-    "build:demo": "vite build",
-    "build:plugin": "run-s clean:temp build:plugin:js build:plugin:types clean:temp",
+    "build": "run-s clean:temp build:plugin:js build:plugin:types clean:temp",
     "build:plugin:js": "vite build --config vite.plugin.config.ts",
     "build:plugin:types": "tsc -p tsconfig.plugin.json && rollup -c rollup.dts.config.mjs",
     "clean:temp": "rm -rf ./temp",

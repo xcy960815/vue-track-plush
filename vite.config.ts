@@ -30,7 +30,4 @@ const trackApiMock = (): Plugin => ({
 
 export default defineConfig({
   plugins: [vue2(), trackApiMock()],
-  build: {
-    outDir: 'demo-dist',
-  },
 });

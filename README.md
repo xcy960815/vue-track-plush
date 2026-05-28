@@ -273,14 +273,6 @@ pnpm install
 pnpm dev
 ```
 
-Build the demo:
-
-```sh
-pnpm build:demo
-```
-
-The demo build output is written to `demo-dist`.
-
 ## Development
 
 ```sh

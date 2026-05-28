@@ -273,14 +273,6 @@ pnpm install
 pnpm dev
 ```
 
-构建 demo：
-
-```sh
-pnpm build:demo
-```
-
-demo 构建产物输出到 `demo-dist`。
-
 ## 本地开发
 
 ```sh
