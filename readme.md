@@ -201,10 +201,4 @@ pnpm build
 - `dist/vue-track-plush.esm.js`
 - `types/vue-track-plush.d.ts`
 
-### 构建 demo
-
-```sh
-pnpm build:demo
-```
-
 demo 构建产物输出到 `demo-dist`，不会覆盖插件产物。
