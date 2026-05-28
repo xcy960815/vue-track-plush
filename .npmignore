@@ -1,10 +1,29 @@
 .DS_Store
 node_modules
-example/
+demo-dist/
 src/
+plugin/
 .babelrc
 .gitignore
 package-lock.json
 pnpm-lock.yaml
 rollup.config.js
+rollup.config.mjs
+rollup.dts.config.mjs
 vue.config.js
+vite.config.ts
+vite.plugin.config.ts
+tsconfig.json
+tsconfig.plugin.json
+index.html
+temp/
+
+# local env files
+.env.local
+.env.*.local
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
