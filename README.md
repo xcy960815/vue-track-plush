@@ -6,11 +6,13 @@ Vue 2.7 tracking plugin based on custom directives. It supports click, page view
 
 ## Features
 
-- Vue 2 directive API: `v-track:click`, `v-track:browse`, `v-track:exposure`
+- Vue 2 directive API with the recommended `v-track:click="{ ... }"`, `v-track:browse="{ ... }"`, and `v-track:exposure="{ ... }"` syntax
 - Manual APIs: `clickEvent`, `browseEvent`, `exposureEvent`
-- String and object `track-params` support
+- Legacy `track-params` string and object compatibility
 - Batched exposure reporting with queue, interval flush, and localStorage cache
+- Global and per-element exposure options
 - Configurable request timeout, credentials, headers, retry, and retry delay
+- Pluggable `transport`
 - TypeScript source and generated declaration file
 - Vite library build with UMD and ESM outputs
 
@@ -37,6 +39,8 @@ yarn add vue-track-plush
 
 ## Quick Start
 
+Vue 2 installation is still `Vue.use(VueTrackPlush, config)`.
+
 ```ts
 import Vue from 'vue';
 import VueTrackPlush from 'vue-track-plush';
@@ -46,14 +50,12 @@ Vue.use(VueTrackPlush, {
   baseURL: 'https://example.com',
   url: '/api/track',
   projectName: 'my-project',
-  queue: {
-    maxBatchSize: 20,
-    flushInterval: 2000,
-  },
-  exposure: {
-    threshold: 0.5,
-    once: true,
-  },
+  debug: process.env.NODE_ENV === 'development',
+  exposureThreshold: 0.5,
+  exposureDuration: 0,
+  exposureOnce: true,
+  exposureQueueMaxSize: 20,
+  exposureQueueFlushInterval: 2000,
 });
 
 new Vue({
@@ -67,44 +69,28 @@ new Vue({
 
 ```vue
 <template>
-  <button
-    v-track:click
-    :track-params="{
-      buttonName: 'Save',
-      module: 'profile',
-    }"
-  >
-    Save
-  </button>
+  <button v-track:click="{ buttonName: 'Save' }">Save</button>
 </template>
 ```
 
-When `track-params` is a string, it is reported as `buttonName`.
+When the directive value is a string, it is reported as `buttonName`.
 
 ```vue
-<button v-track:click track-params="Save">Save</button>
+<button v-track:click="'Save'">Save</button>
 ```
 
 ### Browse Tracking
 
 ```vue
 <template>
-  <section
-    v-track:browse
-    :track-params="{
-      pageName: 'Profile Page',
-      module: 'profile',
-    }"
-  >
-    Profile
-  </section>
+  <section v-track:browse="{ pageName: 'Profile Page' }">Profile</section>
 </template>
 ```
 
-When `track-params` is a string, it is reported as `pageName`.
+When the directive value is a string, it is reported as `pageName`.
 
 ```vue
-<section v-track:browse track-params="Profile Page">Profile</section>
+<section v-track:browse="'Profile Page'">Profile</section>
 ```
 
 ### Exposure Tracking
@@ -112,10 +98,10 @@ When `track-params` is a string, it is reported as `pageName`.
 ```vue
 <template>
   <div
-    v-track:exposure
-    :track-params="{
-      areaName: 'Promotion Banner',
-      bannerId: 1001,
+    v-track:exposure="{
+      exposureName: 'Promotion Banner',
+      threshold: 0.5,
+      duration: 1000,
     }"
   >
     Promotion Banner
@@ -123,17 +109,34 @@ When `track-params` is a string, it is reported as `pageName`.
 </template>
 ```
 
-Exposure tracking uses `IntersectionObserver`. By default, an element is reported once when at least 50% of it enters the viewport.
+Exposure tracking uses `IntersectionObserver`. By default, an element is reported once when at least 50% of it enters the viewport. Each element can override `threshold`, `duration`, `once`, `root`, and `rootMargin` from the directive value; those control fields are removed from the final reporting payload.
+
+When the exposure directive value is a string, it is reported as `exposureName`.
+
+```vue
+<div v-track:exposure="'Promotion Banner'">Promotion Banner</div>
+```
+
+### Legacy `track-params`
+
+The recommended syntax for new code is the directive value. The plugin still supports the previous `track-params` syntax for compatibility. It reads `vnode.data.attrs['track-params']` only when `binding.value` is `undefined`, then falls back to the DOM `track-params` attribute.
+
+```vue
+<button v-track:click track-params="Save">Save</button>
+
+<section v-track:browse :track-params="{ pageName: 'Profile Page' }">Profile</section>
+
+<div v-track:exposure :track-params="{ areaName: 'Promotion Banner' }">Promotion Banner</div>
+```
+
+Legacy exposure `areaName` remains a normal business payload field. New code should use `exposureName`.
 
 ### Combined Directives
 
 Multiple event types can be bound to the same element with `|`.
 
 ```vue
-<button
-  v-track:click|exposure
-  :track-params="{ buttonName: 'Buy Now', areaName: 'Buy Button' }"
->
+<button v-track:click|exposure="{ buttonName: 'Buy Now', exposureName: 'Buy Button' }">
   Buy Now
 </button>
 ```
@@ -162,7 +165,7 @@ exposureEvent({
   baseURL: 'https://example.com',
   url: '/api/track',
   projectName: 'my-project',
-  areaName: 'Promotion Banner',
+  exposureName: 'Promotion Banner',
 });
 ```
 
@@ -178,15 +181,43 @@ export interface TrackPlushConfig {
   userAgent?: string;
   method?: 'GET' | 'POST' | 'get' | 'post';
   buttonName?: string;
+  exposureName?: string;
   maxNum?: number;
   timeout?: number;
   withCredentials?: boolean;
   headers?: Record<string, string>;
   retry?: number;
   retryDelay?: number;
+  exposureThreshold?: number;
+  exposureDuration?: number;
+  exposureOnce?: boolean;
+  exposureRoot?: Element | Document | null;
+  exposureRootMargin?: string;
+  exposureQueueMaxSize?: number;
+  exposureQueueFlushInterval?: number;
+  exposureQueueStorageKey?: string;
+  debug?: boolean;
+  transport?: TrackTransport;
   queue?: QueueConfig;
   exposure?: ExposureConfig;
   [key: string]: unknown;
+}
+
+export interface TrackTransport {
+  send(requestConfig: RequestConfig): Promise<void> | void;
+}
+
+export interface RequestConfig {
+  baseURL?: string;
+  url?: string;
+  method?: 'GET' | 'POST' | 'get' | 'post';
+  data?: Record<string, unknown>;
+  debug?: boolean;
+  withCredentials?: boolean;
+  timeout?: number;
+  headers?: Record<string, string>;
+  retry?: number;
+  retryDelay?: number;
 }
 
 export interface QueueConfig {
@@ -197,6 +228,8 @@ export interface QueueConfig {
 
 export interface ExposureConfig {
   threshold?: number;
+  duration?: number;
+  root?: Element | Document | null;
   rootMargin?: string;
   once?: boolean;
 }
@@ -215,14 +248,46 @@ export interface ExposureConfig {
 | `headers` | `Record<string, string>` | `{}` | Custom request headers. |
 | `retry` | `number` | `0` | Retry count after request failure. |
 | `retryDelay` | `number` | `300` | Retry delay in milliseconds. |
-| `queue.maxBatchSize` | `number` | `20` | Exposure batch size. |
-| `queue.flushInterval` | `number` | `2000` | Exposure queue flush interval in milliseconds. |
-| `queue.storageKey` | `string` | `'cacheTrackData'` | localStorage key for unsent exposure events. |
-| `exposure.threshold` | `number` | `0.5` | Intersection threshold for exposure tracking. |
-| `exposure.rootMargin` | `string` | `'0px'` | IntersectionObserver root margin. |
-| `exposure.once` | `boolean` | `true` | Whether each exposure element is reported only once. |
+| `debug` | `boolean` | `false` | Skip network requests and print the final tracking payload JSON to the console. |
+| `transport` | `TrackTransport` | built-in XHR transport | Custom reporting transport. |
+| `exposureThreshold` | `number` | `0.5` | Default visible ratio for exposure tracking. |
+| `exposureDuration` | `number` | `0` | Default visible duration in milliseconds before reporting exposure. |
+| `exposureOnce` | `boolean` | `true` | Whether each exposure element is reported only once. |
+| `exposureRoot` | `Element | Document | null` | `null` | Default IntersectionObserver root. |
+| `exposureRootMargin` | `string` | `'0px'` | Default IntersectionObserver root margin. |
+| `exposureQueueMaxSize` | `number` | `20` | Exposure batch size. |
+| `exposureQueueFlushInterval` | `number` | `2000` | Exposure queue flush interval in milliseconds. |
+| `exposureQueueStorageKey` | `string` | `'cacheTrackData'` | localStorage key for unsent exposure events. |
+
+Legacy config remains supported: `queue.maxBatchSize` maps to `exposureQueueMaxSize`, `queue.flushInterval` maps to `exposureQueueFlushInterval`, `queue.storageKey` maps to `exposureQueueStorageKey`, `exposure.threshold` maps to `exposureThreshold`, `exposure.duration` maps to `exposureDuration`, `exposure.root` maps to `exposureRoot`, `exposure.rootMargin` maps to `exposureRootMargin`, and `exposure.once` maps to `exposureOnce`.
+
+### Custom Transport
+
+```ts
+import VueTrackPlush, { type TrackTransport } from 'vue-track-plush';
+
+const transport: TrackTransport = {
+  send(requestConfig) {
+    return fetch(`${requestConfig.baseURL}${requestConfig.url}`, {
+      method: requestConfig.method || 'POST',
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      body: JSON.stringify(requestConfig.data),
+      credentials: 'include',
+    }).then(() => undefined);
+  },
+};
+
+Vue.use(VueTrackPlush, {
+  baseURL: 'https://example.com',
+  url: '/api/track',
+  projectName: 'my-project',
+  transport,
+});
+```
 
 ## Payload Shape
+
+When `debug` is enabled, the same payload is printed to the console with the `[vue-track-plush][debug]` prefix and no network request is sent.
 
 Click and browse events are sent as a single object.
 
@@ -249,7 +314,7 @@ Exposure events are sent in batches.
   "timestamp": 1710000000000,
   "list": [
     {
-      "areaName": "Promotion Banner",
+      "exposureName": "Promotion Banner",
       "bannerId": 1001
     }
   ]

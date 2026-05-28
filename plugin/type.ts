@@ -4,7 +4,11 @@ export type TrackMethod = 'GET' | 'POST' | 'get' | 'post';
 
 export type TrackParams = string | Record<string, unknown> | undefined;
 
+export type TrackEventType = 'click' | 'browse' | 'exposure';
+
 export type TrackActionType = '点击事件' | '浏览事件' | '曝光事件';
+
+export type TrackPayloadData = Record<string, unknown>;
 
 export interface QueueConfig {
   maxBatchSize?: number;
@@ -14,6 +18,8 @@ export interface QueueConfig {
 
 export interface ExposureConfig {
   threshold?: number;
+  duration?: number;
+  root?: Element | Document | null;
   rootMargin?: string;
   once?: boolean;
 }
@@ -27,22 +33,46 @@ export interface TrackPlushConfig {
   userAgent?: string;
   method?: TrackMethod;
   buttonName?: string;
+  exposureName?: string;
   maxNum?: number;
   timeout?: number;
   withCredentials?: boolean;
   headers?: Record<string, string>;
   retry?: number;
   retryDelay?: number;
+  exposureThreshold?: number;
+  exposureDuration?: number;
+  exposureOnce?: boolean;
+  exposureRoot?: Element | Document | null;
+  exposureRootMargin?: string;
+  exposureQueueMaxSize?: number;
+  exposureQueueFlushInterval?: number;
+  exposureQueueStorageKey?: string;
+  debug?: boolean;
+  transport?: TrackTransport;
   queue?: QueueConfig;
   exposure?: ExposureConfig;
   [key: string]: unknown;
+}
+
+export interface NormalizedTrackPlushConfig extends Partial<TrackPlushConfig> {
+  exposureThreshold: number;
+  exposureDuration: number;
+  exposureOnce: boolean;
+  exposureRoot: Element | Document | null;
+  exposureRootMargin: string;
+  exposureQueueMaxSize: number;
+  exposureQueueFlushInterval: number;
+  exposureQueueStorageKey: string;
+  debug: boolean;
 }
 
 export interface RequestConfig {
   baseURL?: string;
   url?: string;
   method?: TrackMethod;
-  data?: Record<string, unknown>;
+  data?: TrackPayloadData;
+  debug?: boolean;
   withCredentials?: boolean;
   timeout?: number;
   headers?: Record<string, string>;
@@ -50,6 +80,10 @@ export interface RequestConfig {
   onError?: (xhr: XMLHttpRequest) => void;
   retry?: number;
   retryDelay?: number;
+}
+
+export interface TrackTransport {
+  send(requestConfig: RequestConfig): Promise<void> | void;
 }
 
 export interface TrackPayload extends Record<string, unknown> {

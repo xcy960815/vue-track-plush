@@ -1,22 +1,28 @@
-import type { ExposurePayload, TrackActionType, TrackParams, TrackPayload, TrackPlushConfig } from '../type';
+import type {
+  ExposurePayload,
+  NormalizedTrackPlushConfig,
+  TrackActionType,
+  TrackPayload,
+} from '../type';
 
+/**
+ * @param {string} [pageUrl] Optional page URL override.
+ * @param {string} [userAgent] Optional user agent override.
+ * @returns {{ userAgent: string; pageUrl: string }} Runtime metadata attached to every event.
+ */
 export const getRuntimeInfo = (pageUrl?: string, userAgent?: string) => ({
   userAgent: userAgent || window.navigator.userAgent,
   pageUrl: pageUrl || window.location.href,
 });
 
-export const normalizeTrackParams = (trackParams: TrackParams, stringKey: string) => {
-  if (typeof trackParams === 'string') {
-    return {
-      [stringKey]: trackParams,
-    };
-  }
-
-  return trackParams && typeof trackParams === 'object' ? trackParams : {};
-};
-
+/**
+ * @param {NormalizedTrackPlushConfig} config Plugin-level tracking configuration.
+ * @param {TrackActionType} actionType Tracking action type.
+ * @param {Record<string, unknown>} payload Event-specific payload fields.
+ * @returns {TrackPayload} Final payload sent to transport.
+ */
 export const createTrackPayload = (
-  config: Partial<TrackPlushConfig>,
+  config: NormalizedTrackPlushConfig,
   actionType: TrackActionType,
   payload: Record<string, unknown>,
 ): TrackPayload => ({
@@ -27,8 +33,13 @@ export const createTrackPayload = (
   ...payload,
 });
 
+/**
+ * @param {NormalizedTrackPlushConfig} config Plugin-level tracking configuration.
+ * @param {ExposurePayload[]} list Batched exposure payload list.
+ * @returns {TrackPayload} Final exposure payload sent to transport.
+ */
 export const createExposurePayload = (
-  config: Partial<TrackPlushConfig>,
+  config: NormalizedTrackPlushConfig,
   list: ExposurePayload[],
 ): TrackPayload => ({
   ...getRuntimeInfo(config.pageUrl, config.userAgent),

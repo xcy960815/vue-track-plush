@@ -6,5 +6,6 @@ export const createDemoTrackConfig = (
   baseURL: window.location.origin,
   url: '/track-api',
   projectName: '测试开发',
+  debug: true,
   ...config,
 });

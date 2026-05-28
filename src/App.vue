@@ -6,7 +6,6 @@
       <router-link to="/browse">浏览埋点</router-link>
       <router-link to="/exposure">曝光埋点</router-link>
     </aside>
-
     <main class="demo-main">
       <router-view />
     </main>

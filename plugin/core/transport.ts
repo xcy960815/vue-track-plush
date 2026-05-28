@@ -1,9 +1,24 @@
-import type { RequestConfig, TrackPlushConfig } from '../type';
+import type { NormalizedTrackPlushConfig, RequestConfig, TrackTransport } from '../type';
 
-export interface Transport {
-  send(data: Record<string, unknown>): Promise<void>;
+export type Transport = TrackTransport;
+
+export class ConsoleTransport implements Transport {
+  /**
+   * @param {RequestConfig} requestConfig Final request config printed to the console.
+   * @returns {Promise<void>} Promise resolved after console output.
+   */
+  send(requestConfig: RequestConfig) {
+    // Debug mode intentionally skips network requests and prints the final payload.
+    console.info('[vue-track-plush][debug]', JSON.stringify(requestConfig.data, null, 2));
+    return Promise.resolve();
+  }
 }
 
+/**
+ * @param {string} url Base request URL.
+ * @param {Record<string, unknown>} [data] Query data appended for GET requests.
+ * @returns {string} URL with serialized query parameters.
+ */
 const appendQuery = (url: string, data?: Record<string, unknown>) => {
   if (!data || Object.keys(data).length === 0) return url;
 
@@ -19,6 +34,10 @@ const appendQuery = (url: string, data?: Record<string, unknown>) => {
   return `${url}${url.includes('?') ? '&' : '?'}${query}`;
 };
 
+/**
+ * @param {RequestConfig} [requestConfig] XHR request configuration for one tracking payload.
+ * @returns {Promise<void>} Promise resolved on 2xx responses and rejected after retries are exhausted.
+ */
 export const createRequest = (requestConfig: RequestConfig = {}) =>
   new Promise<void>((resolve, reject) => {
     const {
@@ -89,23 +108,30 @@ export const createRequest = (requestConfig: RequestConfig = {}) =>
   });
 
 export class XhrTransport implements Transport {
-  private config: Partial<TrackPlushConfig>;
+  private config: NormalizedTrackPlushConfig;
 
-  constructor(config: Partial<TrackPlushConfig>) {
+  /**
+   * @param {NormalizedTrackPlushConfig} config Plugin-level request configuration.
+   */
+  constructor(config: NormalizedTrackPlushConfig) {
     this.config = config;
   }
 
-  send(data: Record<string, unknown>) {
+  /**
+   * @param {RequestConfig} requestConfig Final tracking request config sent through XHR.
+   * @returns {Promise<void>} Promise resolved when the request succeeds.
+   */
+  send(requestConfig: RequestConfig) {
     return createRequest({
-      timeout: this.config.timeout || 10000,
-      baseURL: this.config.baseURL,
-      withCredentials: this.config.withCredentials ?? true,
-      url: this.config.url,
-      method: this.config.method || 'post',
-      headers: this.config.headers,
-      retry: this.config.retry,
-      retryDelay: this.config.retryDelay,
-      data,
+      timeout: requestConfig.timeout || this.config.timeout || 10000,
+      baseURL: requestConfig.baseURL || this.config.baseURL,
+      withCredentials: requestConfig.withCredentials ?? this.config.withCredentials ?? true,
+      url: requestConfig.url || this.config.url,
+      method: requestConfig.method || this.config.method || 'post',
+      headers: requestConfig.headers || this.config.headers,
+      retry: requestConfig.retry ?? this.config.retry,
+      retryDelay: requestConfig.retryDelay ?? this.config.retryDelay,
+      data: requestConfig.data,
     });
   }
 }

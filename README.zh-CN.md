@@ -6,10 +6,12 @@
 
 ## 特性
 
-- Vue 2 指令 API：`v-track:click`、`v-track:browse`、`v-track:exposure`
+- Vue 2 指令 API：推荐使用 `v-track:click="{ ... }"`、`v-track:browse="{ ... }"`、`v-track:exposure="{ ... }"`
 - 手动上报 API：`clickEvent`、`browseEvent`、`exposureEvent`
-- `track-params` 支持字符串和对象
+- 兼容旧版 `track-params` 字符串和对象写法
 - 曝光事件支持批量队列、定时 flush 和 localStorage 缓存
+- 曝光参数支持全局配置和单个元素覆盖
+- 支持自定义上报 `transport`
 - 请求支持超时、携带凭证、自定义 headers、失败重试和重试间隔
 - TypeScript 源码和声明文件
 - Vite library mode 构建，输出 UMD 和 ESM
@@ -37,6 +39,8 @@ yarn add vue-track-plush
 
 ## 快速开始
 
+Vue2 安装方式仍然是 `Vue.use(VueTrackPlush, config)`。
+
 ```ts
 import Vue from 'vue';
 import VueTrackPlush from 'vue-track-plush';
@@ -46,14 +50,12 @@ Vue.use(VueTrackPlush, {
   baseURL: 'https://example.com',
   url: '/api/track',
   projectName: 'my-project',
-  queue: {
-    maxBatchSize: 20,
-    flushInterval: 2000,
-  },
-  exposure: {
-    threshold: 0.5,
-    once: true,
-  },
+  debug: process.env.NODE_ENV === 'development',
+  exposureThreshold: 0.5,
+  exposureDuration: 0,
+  exposureOnce: true,
+  exposureQueueMaxSize: 20,
+  exposureQueueFlushInterval: 2000,
 });
 
 new Vue({
@@ -67,44 +69,28 @@ new Vue({
 
 ```vue
 <template>
-  <button
-    v-track:click
-    :track-params="{
-      buttonName: '保存',
-      module: 'profile',
-    }"
-  >
-    保存
-  </button>
+  <button v-track:click="{ buttonName: '保存' }">保存</button>
 </template>
 ```
 
-当 `track-params` 是字符串时，会作为 `buttonName` 上报。
+当指令 value 是字符串时，会作为 `buttonName` 上报。
 
 ```vue
-<button v-track:click track-params="保存">保存</button>
+<button v-track:click="'保存'">保存</button>
 ```
 
 ### 浏览埋点
 
 ```vue
 <template>
-  <section
-    v-track:browse
-    :track-params="{
-      pageName: '个人资料页',
-      module: 'profile',
-    }"
-  >
-    个人资料
-  </section>
+  <section v-track:browse="{ pageName: '个人资料页' }">个人资料</section>
 </template>
 ```
 
-当 `track-params` 是字符串时，会作为 `pageName` 上报。
+当指令 value 是字符串时，会作为 `pageName` 上报。
 
 ```vue
-<section v-track:browse track-params="个人资料页">个人资料</section>
+<section v-track:browse="'个人资料页'">个人资料</section>
 ```
 
 ### 曝光埋点
@@ -112,10 +98,10 @@ new Vue({
 ```vue
 <template>
   <div
-    v-track:exposure
-    :track-params="{
-      areaName: '活动 Banner',
-      bannerId: 1001,
+    v-track:exposure="{
+      exposureName: '活动 Banner',
+      threshold: 0.5,
+      duration: 1000,
     }"
   >
     活动 Banner
@@ -123,17 +109,34 @@ new Vue({
 </template>
 ```
 
-曝光埋点基于 `IntersectionObserver`。默认元素进入视口 50% 后触发，并且每个元素只上报一次。
+曝光埋点基于 `IntersectionObserver`。默认元素进入视口 50% 后触发，并且每个元素只上报一次。单个元素可通过指令 value 覆盖 `threshold`、`duration`、`once`、`root`、`rootMargin`；这些控制字段不会进入最终上报 payload。
+
+当曝光指令 value 是字符串时，会作为 `exposureName` 上报。
+
+```vue
+<div v-track:exposure="'活动 Banner'">活动 Banner</div>
+```
+
+### 兼容旧写法 `track-params`
+
+推荐新项目使用指令 value 写法。插件仍兼容旧版本的 `track-params`，仅当 `binding.value` 是 `undefined` 时才会读取 `vnode.data.attrs['track-params']`，最后读取 DOM 上的 `track-params` 属性。
+
+```vue
+<button v-track:click track-params="保存">保存</button>
+
+<section v-track:browse :track-params="{ pageName: '个人资料页' }">个人资料</section>
+
+<div v-track:exposure :track-params="{ areaName: '活动 Banner' }">活动 Banner</div>
+```
+
+曝光旧写法里的 `areaName` 会继续作为普通业务字段上报；新代码建议使用 `exposureName`。
 
 ### 组合指令
 
 同一个元素可以通过 `|` 绑定多个事件类型。
 
 ```vue
-<button
-  v-track:click|exposure
-  :track-params="{ buttonName: '立即购买', areaName: '购买按钮' }"
->
+<button v-track:click|exposure="{ buttonName: '立即购买', exposureName: '购买按钮' }">
   立即购买
 </button>
 ```
@@ -162,7 +165,7 @@ exposureEvent({
   baseURL: 'https://example.com',
   url: '/api/track',
   projectName: 'my-project',
-  areaName: '活动 Banner',
+  exposureName: '活动 Banner',
 });
 ```
 
@@ -178,15 +181,43 @@ export interface TrackPlushConfig {
   userAgent?: string;
   method?: 'GET' | 'POST' | 'get' | 'post';
   buttonName?: string;
+  exposureName?: string;
   maxNum?: number;
   timeout?: number;
   withCredentials?: boolean;
   headers?: Record<string, string>;
   retry?: number;
   retryDelay?: number;
+  exposureThreshold?: number;
+  exposureDuration?: number;
+  exposureOnce?: boolean;
+  exposureRoot?: Element | Document | null;
+  exposureRootMargin?: string;
+  exposureQueueMaxSize?: number;
+  exposureQueueFlushInterval?: number;
+  exposureQueueStorageKey?: string;
+  debug?: boolean;
+  transport?: TrackTransport;
   queue?: QueueConfig;
   exposure?: ExposureConfig;
   [key: string]: unknown;
+}
+
+export interface TrackTransport {
+  send(requestConfig: RequestConfig): Promise<void> | void;
+}
+
+export interface RequestConfig {
+  baseURL?: string;
+  url?: string;
+  method?: 'GET' | 'POST' | 'get' | 'post';
+  data?: Record<string, unknown>;
+  debug?: boolean;
+  withCredentials?: boolean;
+  timeout?: number;
+  headers?: Record<string, string>;
+  retry?: number;
+  retryDelay?: number;
 }
 
 export interface QueueConfig {
@@ -197,6 +228,8 @@ export interface QueueConfig {
 
 export interface ExposureConfig {
   threshold?: number;
+  duration?: number;
+  root?: Element | Document | null;
   rootMargin?: string;
   once?: boolean;
 }
@@ -215,14 +248,46 @@ export interface ExposureConfig {
 | `headers` | `Record<string, string>` | `{}` | 自定义请求头。 |
 | `retry` | `number` | `0` | 请求失败后的重试次数。 |
 | `retryDelay` | `number` | `300` | 重试间隔，单位毫秒。 |
-| `queue.maxBatchSize` | `number` | `20` | 曝光批量上报数量。 |
-| `queue.flushInterval` | `number` | `2000` | 曝光队列定时上报间隔，单位毫秒。 |
-| `queue.storageKey` | `string` | `'cacheTrackData'` | 未上报曝光事件的 localStorage 缓存 key。 |
-| `exposure.threshold` | `number` | `0.5` | 曝光触发阈值。 |
-| `exposure.rootMargin` | `string` | `'0px'` | IntersectionObserver 的 rootMargin。 |
-| `exposure.once` | `boolean` | `true` | 每个曝光元素是否只上报一次。 |
+| `debug` | `boolean` | `false` | 跳过接口请求，并在控制台输出最终上报 payload JSON。 |
+| `transport` | `TrackTransport` | 内置 XHR transport | 自定义上报实现。 |
+| `exposureThreshold` | `number` | `0.5` | 默认曝光可见比例。 |
+| `exposureDuration` | `number` | `0` | 默认曝光停留时长，单位毫秒。 |
+| `exposureOnce` | `boolean` | `true` | 每个曝光元素是否只上报一次。 |
+| `exposureRoot` | `Element | Document | null` | `null` | 默认 IntersectionObserver root。 |
+| `exposureRootMargin` | `string` | `'0px'` | 默认 IntersectionObserver rootMargin。 |
+| `exposureQueueMaxSize` | `number` | `20` | 曝光批量上报数量。 |
+| `exposureQueueFlushInterval` | `number` | `2000` | 曝光队列定时上报间隔，单位毫秒。 |
+| `exposureQueueStorageKey` | `string` | `'cacheTrackData'` | 未上报曝光事件的 localStorage 缓存 key。 |
+
+旧配置仍兼容：`queue.maxBatchSize` 会映射到 `exposureQueueMaxSize`，`queue.flushInterval` 会映射到 `exposureQueueFlushInterval`，`queue.storageKey` 会映射到 `exposureQueueStorageKey`，`exposure.threshold` 会映射到 `exposureThreshold`，`exposure.duration` 会映射到 `exposureDuration`，`exposure.root` 会映射到 `exposureRoot`，`exposure.rootMargin` 会映射到 `exposureRootMargin`，`exposure.once` 会映射到 `exposureOnce`。
+
+### 自定义 transport
+
+```ts
+import VueTrackPlush, { type TrackTransport } from 'vue-track-plush';
+
+const transport: TrackTransport = {
+  send(requestConfig) {
+    return fetch(`${requestConfig.baseURL}${requestConfig.url}`, {
+      method: requestConfig.method || 'POST',
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      body: JSON.stringify(requestConfig.data),
+      credentials: 'include',
+    }).then(() => undefined);
+  },
+};
+
+Vue.use(VueTrackPlush, {
+  baseURL: 'https://example.com',
+  url: '/api/track',
+  projectName: 'my-project',
+  transport,
+});
+```
 
 ## 上报数据结构
+
+开启 `debug` 后，不会发送网络请求；插件会以 `[vue-track-plush][debug]` 前缀在控制台输出同样的 payload JSON。
 
 点击和浏览事件会以单个对象上报。
 
@@ -249,7 +314,7 @@ export interface ExposureConfig {
   "timestamp": 1710000000000,
   "list": [
     {
-      "areaName": "活动 Banner",
+      "exposureName": "活动 Banner",
       "bannerId": 1001
     }
   ]
