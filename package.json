@@ -48,7 +48,8 @@
     "vue": "^2.7.16"
   },
   "dependencies": {
-    "intersection-observer": "^0.11.0"
+    "intersection-observer": "^0.11.0",
+    "vue-router": "^3.6.5"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

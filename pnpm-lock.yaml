@@ -11,6 +11,9 @@ importers:
       intersection-observer:
         specifier: ^0.11.0
         version: 0.11.0
+      vue-router:
+        specifier: ^3.6.5
+        version: 3.6.5(vue@2.7.16)
     devDependencies:
       '@vitejs/plugin-vue2':
         specifier: ^2.3.4
@@ -661,6 +664,11 @@ packages:
       yaml:
         optional: true
 
+  vue-router@3.6.5:
+    resolution: {integrity: sha512-VYXZQLtjuvKxxcshuRAwjHnciqZVoXAjTjcqBTz4rKc8qih9g9pI3hbDjmqXaHdgL3v8pV6P8Z335XvHzESxLQ==}
+    peerDependencies:
+      vue: ^2
+
   vue@2.7.16:
     resolution: {integrity: sha512-4gCtFXaAA3zYZdTp5s4Hl2sozuySsgz4jy1EnpBHNfpMa9dK1ZCG7viqBPCwXtmgc8nHqUsAu3G4gtmXkkY3Sw==}
     deprecated: Vue 2 has reached EOL and is no longer actively maintained. See https://v2.vuejs.org/eol/ for more details.
@@ -1170,6 +1178,10 @@ snapshots:
       fsevents: 2.3.3
       less: 4.4.0
       terser: 5.43.1
+
+  vue-router@3.6.5(vue@2.7.16):
+    dependencies:
+      vue: 2.7.16
 
   vue@2.7.16:
     dependencies:
