@@ -1,20 +1,5 @@
 import type { TrackElement, TrackParams } from './type';
 
-export const getRuntimeInfo = (pageUrl?: string, userAgent?: string) => ({
-  userAgent: userAgent || window.navigator.userAgent,
-  pageUrl: pageUrl || window.location.href,
-});
-
-export const normalizeTrackParams = (trackParams: TrackParams, stringKey: string) => {
-  if (typeof trackParams === 'string') {
-    return {
-      [stringKey]: trackParams,
-    };
-  }
-
-  return trackParams && typeof trackParams === 'object' ? trackParams : {};
-};
-
 export const stringifyTrackParams = (trackParams: TrackParams) => {
   if (typeof trackParams === 'string') return trackParams;
 

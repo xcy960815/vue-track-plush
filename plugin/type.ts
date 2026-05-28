@@ -4,6 +4,20 @@ export type TrackMethod = 'GET' | 'POST' | 'get' | 'post';
 
 export type TrackParams = string | Record<string, unknown> | undefined;
 
+export type TrackActionType = '点击事件' | '浏览事件' | '曝光事件';
+
+export interface QueueConfig {
+  maxBatchSize?: number;
+  flushInterval?: number;
+  storageKey?: string;
+}
+
+export interface ExposureConfig {
+  threshold?: number;
+  rootMargin?: string;
+  once?: boolean;
+}
+
 export interface TrackPlushConfig {
   projectName: string;
   baseURL: string;
@@ -19,6 +33,8 @@ export interface TrackPlushConfig {
   headers?: Record<string, string>;
   retry?: number;
   retryDelay?: number;
+  queue?: QueueConfig;
+  exposure?: ExposureConfig;
   [key: string]: unknown;
 }
 
@@ -35,6 +51,16 @@ export interface RequestConfig {
   retry?: number;
   retryDelay?: number;
 }
+
+export interface TrackPayload extends Record<string, unknown> {
+  actionType: TrackActionType;
+  projectName?: string;
+  userAgent: string;
+  pageUrl: string;
+  timestamp: number;
+}
+
+export type ExposurePayload = TrackParams | null;
 
 export interface DirectiveEntry {
   el: TrackElement;

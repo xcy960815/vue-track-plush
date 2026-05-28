@@ -13,6 +13,11 @@
     "plugin/browse.ts",
     "plugin/exposure.ts",
     "plugin/fetch.ts",
+    "plugin/core/payload.ts",
+    "plugin/core/queue.ts",
+    "plugin/core/storage.ts",
+    "plugin/core/tracker.ts",
+    "plugin/core/transport.ts",
     "plugin/type.ts",
     "plugin/utils.ts"
   ]

@@ -2,6 +2,7 @@ import type { VNode, VNodeDirective, VueConstructor } from 'vue';
 
 import Browse from './browse';
 import Click from './click';
+import Tracker from './core/tracker';
 import Exposure from './exposure';
 import type { TrackElement, TrackParams, TrackPlushConfig, VueTrackPlushPlugin } from './type';
 import { stringifyTrackParams } from './utils';
@@ -23,9 +24,10 @@ const cacheTrackParams = (el: TrackElement, vnode?: VNode) => {
 };
 
 const install = function install(Vue: VueConstructor, trackPlushConfig: Partial<TrackPlushConfig> = {}) {
-  const click = new Click(trackPlushConfig);
-  const browse = new Browse(trackPlushConfig);
-  const exposure = new Exposure(trackPlushConfig);
+  const tracker = new Tracker(trackPlushConfig);
+  const click = new Click(trackPlushConfig, tracker);
+  const browse = new Browse(trackPlushConfig, tracker);
+  const exposure = new Exposure(trackPlushConfig, tracker);
 
   Vue.directive('track', {
     bind(el: HTMLElement, binding: VNodeDirective, vnode: VNode) {
@@ -101,10 +103,8 @@ export const clickEvent = (trackPlushConfig: TrackPlushConfig) => {
     if (!ignoreField.includes(key)) clickEventParams[key] = trackPlushConfig[key];
   });
 
-  new Click(trackPlushConfig).handleClickEvent({
-    ...clickEventParams,
-    type: 'customize',
-  });
+  const tracker = new Tracker(trackPlushConfig);
+  tracker.click(clickEventParams).finally(() => tracker.destroy());
 };
 
 export const browseEvent = (trackPlushConfig: TrackPlushConfig) => {
@@ -113,10 +113,8 @@ export const browseEvent = (trackPlushConfig: TrackPlushConfig) => {
     if (!ignoreField.includes(key)) browseEventParams[key] = trackPlushConfig[key];
   });
 
-  new Browse(trackPlushConfig).handleBrowseEvent({
-    ...browseEventParams,
-    type: 'customize',
-  });
+  const tracker = new Tracker(trackPlushConfig);
+  tracker.browse(browseEventParams).finally(() => tracker.destroy());
 };
 
 export const exposureEvent = (trackPlushConfig: TrackPlushConfig) => {
@@ -125,13 +123,18 @@ export const exposureEvent = (trackPlushConfig: TrackPlushConfig) => {
     if (!ignoreField.includes(key)) exposureEventParams[key] = trackPlushConfig[key];
   });
 
-  new Exposure(trackPlushConfig).handleExposureEvent({
-    ...exposureEventParams,
-    type: 'customize',
-  });
+  const tracker = new Tracker(trackPlushConfig);
+  tracker.exposureNow(exposureEventParams).finally(() => tracker.destroy());
 };
 
-export type { TrackMethod, TrackParams, TrackPlushConfig } from './type';
+export type {
+  ExposureConfig,
+  QueueConfig,
+  TrackActionType,
+  TrackMethod,
+  TrackParams,
+  TrackPlushConfig,
+} from './type';
 
 export default {
   install,

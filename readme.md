@@ -26,6 +26,16 @@ export type TrackPlushConfig = {
   headers?: Record<string, string>;
   retry?: number;
   retryDelay?: number;
+  queue?: {
+    maxBatchSize?: number; // 曝光批量上报最大数量，默认 20
+    flushInterval?: number; // 曝光定时上报间隔，默认 2000ms
+    storageKey?: string; // 曝光缓存 key，默认 cacheTrackData
+  };
+  exposure?: {
+    threshold?: number; // 曝光阈值，默认 0.5
+    rootMargin?: string; // IntersectionObserver rootMargin，默认 0px
+    once?: boolean; // 是否只上报一次，默认 true
+  };
   [key: string]: unknown;
 }
 ```
@@ -44,7 +54,15 @@ import VueTrackPlush from "vue-track-plush"
 Vue.use(VueTrackPlush, {
   baseURL: "<接口域名>",
   url: "<接口地址>",
-  projectName: "项目名称"
+  projectName: "项目名称",
+  queue: {
+    maxBatchSize: 20,
+    flushInterval: 2000
+  },
+  exposure: {
+    threshold: 0.5,
+    once: true
+  }
 })
 new Vue({
   el: '#app',
@@ -208,3 +226,13 @@ pnpm build:demo
 ```
 
 demo 构建产物输出到 `demo-dist`，不会覆盖插件产物。
+
+### 架构说明
+
+插件内部按 Vue 2 指令层和 core 层拆分：
+
+- `plugin/index.ts`：注册 `v-track` 指令和导出手动上报 API
+- `plugin/core/tracker.ts`：统一处理点击、浏览、曝光上报
+- `plugin/core/queue.ts`：曝光批量队列、定时 flush、本地缓存恢复
+- `plugin/core/transport.ts`：请求发送和重试
+- `plugin/core/payload.ts`：统一生成上报 payload

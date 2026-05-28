@@ -2,6 +2,17 @@ import { VueConstructor } from 'vue';
 
 type TrackMethod = 'GET' | 'POST' | 'get' | 'post';
 type TrackParams = string | Record<string, unknown> | undefined;
+type TrackActionType = '点击事件' | '浏览事件' | '曝光事件';
+interface QueueConfig {
+    maxBatchSize?: number;
+    flushInterval?: number;
+    storageKey?: string;
+}
+interface ExposureConfig {
+    threshold?: number;
+    rootMargin?: string;
+    once?: boolean;
+}
 interface TrackPlushConfig {
     projectName: string;
     baseURL: string;
@@ -17,6 +28,8 @@ interface TrackPlushConfig {
     headers?: Record<string, string>;
     retry?: number;
     retryDelay?: number;
+    queue?: QueueConfig;
+    exposure?: ExposureConfig;
     [key: string]: unknown;
 }
 interface VueTrackPlushPlugin {
@@ -30,4 +43,4 @@ declare const exposureEvent: (trackPlushConfig: TrackPlushConfig) => void;
 declare const _default: VueTrackPlushPlugin;
 
 export { browseEvent, clickEvent, _default as default, exposureEvent };
-export type { TrackMethod, TrackParams, TrackPlushConfig };
+export type { ExposureConfig, QueueConfig, TrackActionType, TrackMethod, TrackParams, TrackPlushConfig };
