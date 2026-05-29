@@ -8,9 +8,6 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
 
     steps:
       - name: Checkout
@@ -41,4 +38,6 @@ jobs:
           test "$TAG_VERSION" = "$PACKAGE_VERSION"
 
       - name: Publish package
-        run: npm publish --provenance --access public
+        run: npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN_VUE_TRACK_PLUSH }}
