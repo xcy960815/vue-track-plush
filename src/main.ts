@@ -8,14 +8,11 @@ import router from './router';
 Vue.config.productionTip = false;
 
 Vue.use(VueTrackPlush, createDemoTrackConfig({
-  queue: {
-    maxBatchSize: 5,
-    flushInterval: 2000,
-  },
-  exposure: {
-    threshold: 0.5,
-    once: true,
-  },
+  exposureThreshold: 0.5,
+  exposureDuration: 300,
+  exposureOnce: true,
+  exposureQueueMaxSize: 5,
+  exposureQueueFlushInterval: 2000,
 }));
 
 new Vue({

@@ -1,8 +1,10 @@
 # vue-track-plush
 
+[English](https://github.com/xcy960815/vue-track-plush/blob/3.0.0/README.md)
+
 基于 Vue 2.7 自定义指令的埋点统计插件。支持点击、浏览、曝光埋点，也提供手动上报 API，适合在 Vue 2 项目中快速接入基础行为埋点。
 
-> 当前包定位为 Vue 2.7 插件。如果需要 Vue 3 支持，请在项目中使用对应的 Vue 3 版本。
+> 当前包定位为 Vue 2.7 插件。如果需要 Vue 3 支持，请使用 [vue3-track-plush](https://www.npmjs.com/package/vue3-track-plush)。
 
 ## 特性
 
@@ -126,10 +128,8 @@ new Vue({
 
 <section v-track:browse :track-params="{ pageName: '个人资料页' }">个人资料</section>
 
-<div v-track:exposure :track-params="{ areaName: '活动 Banner' }">活动 Banner</div>
+<div v-track:exposure :track-params="{ exposureName: '活动 Banner' }">活动 Banner</div>
 ```
-
-曝光旧写法里的 `areaName` 会继续作为普通业务字段上报；新代码建议使用 `exposureName`。
 
 ### 组合指令
 
@@ -303,22 +303,20 @@ Vue.use(VueTrackPlush, {
 }
 ```
 
-曝光事件会批量上报。
+曝光事件会按与 Vue3 包一致的标准数组结构批量上报。
 
 ```json
-{
-  "actionType": "曝光事件",
-  "projectName": "my-project",
-  "userAgent": "...",
-  "pageUrl": "https://example.com/home",
-  "timestamp": 1710000000000,
-  "list": [
-    {
-      "exposureName": "活动 Banner",
-      "bannerId": 1001
-    }
-  ]
-}
+[
+  {
+    "actionType": "曝光事件",
+    "projectName": "my-project",
+    "userAgent": "...",
+    "pageUrl": "https://example.com/home",
+    "timestamp": 1710000000000,
+    "exposureName": "活动 Banner",
+    "bannerId": 1001
+  }
+]
 ```
 
 ## Demo

@@ -41,10 +41,16 @@ export const createTrackPayload = (
 export const createExposurePayload = (
   config: NormalizedTrackPlushConfig,
   list: ExposurePayload[],
-): TrackPayload => ({
-  ...getRuntimeInfo(config.pageUrl, config.userAgent),
-  projectName: config.projectName,
-  actionType: '曝光事件',
-  timestamp: Date.now(),
-  list,
-});
+): TrackPayload[] => {
+  const basePayload = {
+    ...getRuntimeInfo(config.pageUrl, config.userAgent),
+    projectName: config.projectName,
+    actionType: '曝光事件' as const,
+    timestamp: Date.now(),
+  };
+
+  return list.map((item) => ({
+    ...basePayload,
+    ...(item && typeof item === 'object' ? item : {}),
+  }));
+};

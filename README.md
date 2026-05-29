@@ -1,8 +1,10 @@
 # vue-track-plush
 
+[中文文档](https://github.com/xcy960815/vue-track-plush/blob/3.0.0/README.zh-CN.md)
+
 Vue 2.7 tracking plugin based on custom directives. It supports click, page view, and exposure tracking, plus manual reporting APIs for custom scenarios.
 
-> This package targets Vue 2.7. If you need Vue 3 support, use the Vue 3 package in your project instead.
+> This package targets Vue 2.7. If you need Vue 3 support, use [vue3-track-plush](https://www.npmjs.com/package/vue3-track-plush).
 
 ## Features
 
@@ -126,10 +128,8 @@ The recommended syntax for new code is the directive value. The plugin still sup
 
 <section v-track:browse :track-params="{ pageName: 'Profile Page' }">Profile</section>
 
-<div v-track:exposure :track-params="{ areaName: 'Promotion Banner' }">Promotion Banner</div>
+<div v-track:exposure :track-params="{ exposureName: 'Promotion Banner' }">Promotion Banner</div>
 ```
-
-Legacy exposure `areaName` remains a normal business payload field. New code should use `exposureName`.
 
 ### Combined Directives
 
@@ -303,22 +303,20 @@ Click and browse events are sent as a single object.
 }
 ```
 
-Exposure events are sent in batches.
+Exposure events are sent in batches using the same standard array shape as the Vue 3 package.
 
 ```json
-{
-  "actionType": "曝光事件",
-  "projectName": "my-project",
-  "userAgent": "...",
-  "pageUrl": "https://example.com/home",
-  "timestamp": 1710000000000,
-  "list": [
-    {
-      "exposureName": "Promotion Banner",
-      "bannerId": 1001
-    }
-  ]
-}
+[
+  {
+    "actionType": "曝光事件",
+    "projectName": "my-project",
+    "userAgent": "...",
+    "pageUrl": "https://example.com/home",
+    "timestamp": 1710000000000,
+    "exposureName": "Promotion Banner",
+    "bannerId": 1001
+  }
+]
 ```
 
 ## Demo

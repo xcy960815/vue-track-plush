@@ -1,7 +1,12 @@
 import { createExposurePayload, createTrackPayload } from './payload';
 import TrackQueue from './queue';
 import { ConsoleTransport, type Transport, XhrTransport } from './transport';
-import type { ExposurePayload, NormalizedTrackPlushConfig, TrackPlushConfig } from '../type';
+import type {
+  ExposurePayload,
+  NormalizedTrackPlushConfig,
+  TrackPayloadData,
+  TrackPlushConfig,
+} from '../type';
 import { normalizeConfig, normalizeTrackParams } from '../utils';
 
 /**
@@ -90,10 +95,10 @@ export default class Tracker {
   }
 
   /**
-   * @param {Record<string, unknown>} data Final tracking payload.
+   * @param {TrackPayloadData} data Final tracking payload.
    * @returns {Promise<void>} Promise resolved after transport handling.
    */
-  private async send(data: Record<string, unknown>) {
+  private async send(data: TrackPayloadData) {
     try {
       await this.transport.send({
         baseURL: this.config.baseURL,
