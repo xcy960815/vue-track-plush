@@ -12,13 +12,11 @@
   ],
   "scripts": {
     "dev": "vite",
-    "serve": "vite",
     "dev:plugin": "vite build --config vite.plugin.config.ts --watch",
     "build": "run-s clean:temp build:plugin:js build:plugin:types clean:temp",
     "build:plugin:js": "vite build --config vite.plugin.config.ts",
     "build:plugin:types": "tsc -p tsconfig.plugin.json && rollup -c rollup.dts.config.mjs",
-    "clean:temp": "rm -rf ./temp",
-    "link": "npm link && npm link vue-track-plush"
+    "clean:temp": "rm -rf ./temp"
   },
   "repository": {
     "type": "git",
@@ -43,11 +41,11 @@
     "rollup-plugin-dts": "^6.4.1",
     "typescript": "^5.9.3",
     "vite": "^7.2.4",
-    "vue": "^2.7.16"
+    "vue": "^2.7.16",
+    "vue-router": "^3.6.5"
   },
   "dependencies": {
-    "intersection-observer": "^0.11.0",
-    "vue-router": "^3.6.5"
+    "intersection-observer": "^0.11.0"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"

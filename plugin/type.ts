@@ -8,7 +8,7 @@ export type TrackEventType = 'click' | 'browse' | 'exposure';
 
 export type TrackActionType = '点击事件' | '浏览事件' | '曝光事件';
 
-export type TrackPayloadData = Record<string, unknown>;
+export type TrackPayloadData = Record<string, unknown> | Array<Record<string, unknown>>;
 
 export interface QueueConfig {
   maxBatchSize?: number;

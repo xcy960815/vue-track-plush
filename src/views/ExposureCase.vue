@@ -1,76 +1,75 @@
 <template>
-  <section class="case-page">
-    <h2>曝光埋点</h2>
+  <article class="case-page" v-track:browse="{ pageName: '曝光配置测试页', routeName: 'exposure' }">
+    <header class="case-header">
+      <h2>曝光配置</h2>
+      <p>滚动容器查看不同曝光参数的触发行为。</p>
+    </header>
 
-    <div
-      class="case-block exposure-box"
-      v-track:exposure
-      :track-params="{
-        areaName: '首屏曝光区域',
-        routeName: 'exposure',
-        caseName: 'first-screen',
-      }"
-    >
-      首屏曝光埋点区域
-    </div>
-
-    <div class="spacer">向下滚动查看延迟曝光区域</div>
-
-    <div
-      class="case-block exposure-box"
-      v-track:exposure
-      :track-params="{
-        areaName: '滚动后曝光区域',
-        routeName: 'exposure',
-        caseName: 'scroll-into-view',
-      }"
-    >
-      滚动后曝光埋点区域
-    </div>
-
-    <div class="case-block">
-      <h3>自定义曝光</h3>
-      <button @click="customExposureReport">自定义曝光上报</button>
-    </div>
-  </section>
+    <section class="scroll-panel">
+      <div class="spacer">向下滚动</div>
+      <div
+        class="exposure-box"
+        v-track:exposure="{ exposureName: '默认曝光区域', routeName: 'exposure' }"
+      >
+        默认曝光：进入视口后上报一次
+      </div>
+      <div class="spacer small">继续滚动</div>
+      <div
+        class="exposure-box strong"
+        v-track:exposure="{
+          exposureName: '停留曝光区域',
+          duration: 1000,
+          threshold: 0.75,
+          routeName: 'exposure',
+        }"
+      >
+        停留曝光：可见 75% 且保持 1 秒
+      </div>
+    </section>
+  </article>
 </template>
 
 <script lang="ts">
 import Vue from 'vue';
 
-import { exposureEvent } from '../../plugin';
-import { createDemoTrackConfig } from '../demo-config';
-
 export default Vue.extend({
   name: 'ExposureCase',
-  methods: {
-    customExposureReport() {
-      exposureEvent(
-        createDemoTrackConfig({
-          areaName: '自定义曝光区域',
-          routeName: 'exposure',
-          caseName: 'custom-exposure',
-          param1: '参数1',
-          param2: '参数2',
-        }),
-      );
-    },
-  },
 });
 </script>
 
 <style scoped lang="less">
-.exposure-box {
-  width: 240px;
+.scroll-panel {
+  height: 420px;
+  overflow-y: auto;
   padding: 16px;
-  border: 1px solid #4b8f8c;
-  background: #eef8f7;
+  border: 1px solid #d8dee9;
+  border-radius: 8px;
+  background: #ffffff;
 }
 
 .spacer {
-  height: 80vh;
-  display: flex;
-  align-items: center;
-  color: #666;
+  height: 360px;
+  display: grid;
+  place-items: center;
+  color: #64748b;
+
+  &.small {
+    height: 220px;
+  }
+}
+
+.exposure-box {
+  min-height: 140px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #dcfce7;
+  color: #166534;
+  font-weight: 600;
+
+  &.strong {
+    background: #fef3c7;
+    color: #92400e;
+  }
 }
 </style>

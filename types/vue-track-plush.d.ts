@@ -3,7 +3,7 @@ import { VueConstructor } from 'vue';
 type TrackMethod = 'GET' | 'POST' | 'get' | 'post';
 type TrackParams = string | Record<string, unknown> | undefined;
 type TrackActionType = '点击事件' | '浏览事件' | '曝光事件';
-type TrackPayloadData = Record<string, unknown>;
+type TrackPayloadData = Record<string, unknown> | Array<Record<string, unknown>>;
 interface QueueConfig {
     maxBatchSize?: number;
     flushInterval?: number;

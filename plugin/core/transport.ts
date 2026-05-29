@@ -1,4 +1,9 @@
-import type { NormalizedTrackPlushConfig, RequestConfig, TrackTransport } from '../type';
+import type {
+  NormalizedTrackPlushConfig,
+  RequestConfig,
+  TrackPayloadData,
+  TrackTransport,
+} from '../type';
 
 export type Transport = TrackTransport;
 
@@ -19,12 +24,15 @@ export class ConsoleTransport implements Transport {
  * @param {Record<string, unknown>} [data] Query data appended for GET requests.
  * @returns {string} URL with serialized query parameters.
  */
-const appendQuery = (url: string, data?: Record<string, unknown>) => {
-  if (!data || Object.keys(data).length === 0) return url;
+const appendQuery = (url: string, data?: TrackPayloadData) => {
+  if (!data) return url;
+
+  const payload = Array.isArray(data) ? { list: data } : data;
+  if (Object.keys(payload).length === 0) return url;
 
   const searchParams = new URLSearchParams();
-  Object.keys(data).forEach((key) => {
-    const value = data[key];
+  Object.keys(payload).forEach((key) => {
+    const value = payload[key];
     if (value === undefined || value === null) return;
     searchParams.append(key, typeof value === 'string' ? value : JSON.stringify(value));
   });

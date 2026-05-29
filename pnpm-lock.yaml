@@ -11,9 +11,6 @@ importers:
       intersection-observer:
         specifier: ^0.11.0
         version: 0.11.0
-      vue-router:
-        specifier: ^3.6.5
-        version: 3.6.5(vue@2.7.16)
     devDependencies:
       '@vitejs/plugin-vue2':
         specifier: ^2.3.4
@@ -39,6 +36,9 @@ importers:
       vue:
         specifier: ^2.7.16
         version: 2.7.16
+      vue-router:
+        specifier: ^3.6.5
+        version: 3.6.5(vue@2.7.16)
 
 packages:
 
