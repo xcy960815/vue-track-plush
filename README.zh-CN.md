@@ -2,6 +2,9 @@
 
 [English](https://github.com/xcy960815/vue-track-plush/blob/3.0.0/README.md)
 
+- 文档地址：https://xcy960815.github.io/vue-track-plush/zh-CN/
+- 在线 Demo：https://xcy960815.github.io/vue-track-plush/zh-CN/guide/demo
+
 基于 Vue 2.7 自定义指令的埋点统计插件。支持点击、浏览、曝光埋点，也提供手动上报 API，适合在 Vue 2 项目中快速接入基础行为埋点。
 
 > 当前包定位为 Vue 2.7 插件。如果需要 Vue 3 支持，请使用 [vue3-track-plush](https://www.npmjs.com/package/vue3-track-plush)。

@@ -2,6 +2,9 @@
 
 [中文文档](https://github.com/xcy960815/vue-track-plush/blob/3.0.0/README.zh-CN.md)
 
+- Documentation: https://xcy960815.github.io/vue-track-plush/
+- Online Demo: https://xcy960815.github.io/vue-track-plush/guide/demo
+
 Vue 2.7 tracking plugin based on custom directives. It supports click, page view, and exposure tracking, plus manual reporting APIs for custom scenarios.
 
 > This package targets Vue 2.7. If you need Vue 3 support, use [vue3-track-plush](https://www.npmjs.com/package/vue3-track-plush).
