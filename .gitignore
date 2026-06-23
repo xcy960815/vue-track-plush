@@ -2,6 +2,9 @@
 node_modules
 /dist
 /demo-dist
+/docs/.vitepress/cache
+/docs/.vitepress/dist
+/docs/public/demo
 /.idea
 /.pnpm-store
 /temp

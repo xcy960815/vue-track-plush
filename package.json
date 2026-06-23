@@ -5,6 +5,7 @@
   "main": "dist/vue-track-plush.umd.js",
   "module": "dist/vue-track-plush.esm.js",
   "types": "types/vue-track-plush.d.ts",
+  "homepage": "https://xcy960815.github.io/vue-track-plush/",
   "private": false,
   "files": [
     "dist",
@@ -16,7 +17,11 @@
     "build": "run-s clean:temp build:plugin:js build:plugin:types clean:temp",
     "build:plugin:js": "vite build --config vite.plugin.config.ts",
     "build:plugin:types": "tsc -p tsconfig.plugin.json && rollup -c rollup.dts.config.mjs",
-    "clean:temp": "rm -rf ./temp"
+    "clean:temp": "rm -rf ./temp",
+    "docs:prepare-demo": "rm -rf docs/public/demo && vite build --base ./ --outDir docs/public/demo",
+    "docs:dev": "pnpm run docs:prepare-demo && pnpm --dir docs run dev",
+    "docs:build": "pnpm run docs:prepare-demo && pnpm --dir docs run build",
+    "docs:preview": "pnpm --dir docs run preview"
   },
   "repository": {
     "type": "git",
