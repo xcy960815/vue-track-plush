@@ -1,5 +1,5 @@
 <template>
-  <article class="case-page" v-track:browse track-params="兼容写法测试页">
+  <article v-track:browse class="case-page" track-params="兼容写法测试页">
     <header class="case-header">
       <h2>兼容写法</h2>
       <p>测试旧版本的静态和动态 track-params 属性，确保升级后仍可工作。</p>

@@ -1,5 +1,5 @@
 <template>
-  <article class="case-page" v-track:browse="{ pageName: '手动上报测试页', routeName: 'manual' }">
+  <article v-track:browse="{ pageName: '手动上报测试页', routeName: 'manual' }" class="case-page">
     <header class="case-header">
       <h2>手动上报</h2>
       <p>测试 clickEvent、browseEvent 和 exposureEvent 三个导出方法。</p>
@@ -23,22 +23,28 @@ export default Vue.extend({
   name: 'ManualCase',
   methods: {
     customClickReport() {
-      clickEvent(createDemoTrackConfig({
-        buttonName: '自定义点击按钮',
-        routeName: 'manual',
-      }));
+      clickEvent(
+        createDemoTrackConfig({
+          buttonName: '自定义点击按钮',
+          routeName: 'manual',
+        }),
+      );
     },
     customBrowseReport() {
-      browseEvent(createDemoTrackConfig({
-        pageName: '自定义浏览页面',
-        routeName: 'manual',
-      }));
+      browseEvent(
+        createDemoTrackConfig({
+          pageName: '自定义浏览页面',
+          routeName: 'manual',
+        }),
+      );
     },
     customExposureReport() {
-      exposureEvent(createDemoTrackConfig({
-        exposureName: '自定义曝光区域',
-        routeName: 'manual',
-      }));
+      exposureEvent(
+        createDemoTrackConfig({
+          exposureName: '自定义曝光区域',
+          routeName: 'manual',
+        }),
+      );
     },
   },
 });

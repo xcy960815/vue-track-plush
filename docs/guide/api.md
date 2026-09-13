@@ -11,10 +11,10 @@
 
 ## Directive modes
 
-| Directive | Main field | Typical usage |
-| --- | --- | --- |
-| `v-track:click` | `buttonName` | Buttons, tabs, or action links |
-| `v-track:browse` | `pageName` | Route containers or page sections |
+| Directive          | Main field     | Typical usage                                       |
+| ------------------ | -------------- | --------------------------------------------------- |
+| `v-track:click`    | `buttonName`   | Buttons, tabs, or action links                      |
+| `v-track:browse`   | `pageName`     | Route containers or page sections                   |
 | `v-track:exposure` | `exposureName` | Banners, cards, or list items entering the viewport |
 
 Multiple event types can be bound to one element with `|`.

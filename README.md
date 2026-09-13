@@ -37,10 +37,10 @@ yarn add vue-track-plush
 
 ## Compatibility
 
-| Package | Version |
-| --- | --- |
-| Vue | `^2.7.0` |
-| Node.js for local development | `^20.19.0 || >=22.12.0` |
+| Package                       | Version                                      |
+| ----------------------------- | -------------------------------------------- |
+| Vue                           | `^2.7.0`                                     |
+| Node.js for local development | <code>^20.19.0 &#124;&#124; >=22.12.0</code> |
 
 ## Quick Start
 
@@ -326,10 +326,10 @@ Exposure events are sent in batches using the same standard array shape as the V
 
 The local demo uses Vue Router and includes separate cases for different tracking scenarios.
 
-| Route | Case |
-| --- | --- |
-| `#/click` | Directive click tracking and manual click tracking |
-| `#/browse` | Directive browse tracking and manual browse tracking |
+| Route        | Case                                                                 |
+| ------------ | -------------------------------------------------------------------- |
+| `#/click`    | Directive click tracking and manual click tracking                   |
+| `#/browse`   | Directive browse tracking and manual browse tracking                 |
 | `#/exposure` | First-screen exposure, scroll exposure, and manual exposure tracking |
 
 Start the demo:

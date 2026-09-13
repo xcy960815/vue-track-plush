@@ -18,10 +18,10 @@ yarn add vue-track-plush
 
 ## 兼容性
 
-| 依赖 | 版本 |
-| --- | --- |
-| Vue | `^2.7.0` |
-| 本地开发 Node.js | `^20.19.0 || >=22.12.0` |
+| 依赖             | 版本                                         |
+| ---------------- | -------------------------------------------- |
+| Vue              | `^2.7.0`                                     |
+| 本地开发 Node.js | <code>^20.19.0 &#124;&#124; >=22.12.0</code> |
 
 ## 快速开始
 
@@ -53,9 +53,7 @@ new Vue({
 <template>
   <button v-track:click="{ buttonName: '保存' }">保存</button>
 
-  <section v-track:browse="{ pageName: '个人资料页' }">
-    个人资料
-  </section>
+  <section v-track:browse="{ pageName: '个人资料页' }">个人资料</section>
 
   <div
     v-track:exposure="{

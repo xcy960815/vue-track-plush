@@ -18,10 +18,10 @@ yarn add vue-track-plush
 
 ## Compatibility
 
-| Package | Version |
-| --- | --- |
-| Vue | `^2.7.0` |
-| Node.js for local development | `^20.19.0 || >=22.12.0` |
+| Package                       | Version                                      |
+| ----------------------------- | -------------------------------------------- |
+| Vue                           | `^2.7.0`                                     |
+| Node.js for local development | <code>^20.19.0 &#124;&#124; >=22.12.0</code> |
 
 ## Quick start
 
@@ -53,9 +53,7 @@ new Vue({
 <template>
   <button v-track:click="{ buttonName: 'Save' }">Save</button>
 
-  <section v-track:browse="{ pageName: 'Profile Page' }">
-    Profile
-  </section>
+  <section v-track:browse="{ pageName: 'Profile Page' }">Profile</section>
 
   <div
     v-track:exposure="{

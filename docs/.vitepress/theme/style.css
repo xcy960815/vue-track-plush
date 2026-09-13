@@ -1,25 +1,237 @@
+/* ---------------------------------------------------------------------------
+   vue-track-plush docs theme
+   Aligns VitePress with the playground design language:
+   dark-first lime/teal palette, mono brand type, soft gradient glows.
+--------------------------------------------------------------------------- */
+
+/* --------------------------------------------------------------- palette */
+
 :root {
-  --vp-c-brand-1: #2563eb;
-  --vp-c-brand-2: #1d4ed8;
-  --vp-c-brand-3: #1e40af;
-  --vp-c-brand-soft: rgba(37, 99, 235, 0.14);
-  --vp-home-hero-name-color: #0f172a;
-  --vp-home-hero-image-background-image:
-    radial-gradient(circle at top, rgba(37, 99, 235, 0.24), transparent 58%);
+  /* light mode · brand */
+  --vp-c-brand-1: #3f9e22;
+  --vp-c-brand-2: #36881d;
+  --vp-c-brand-3: #2c6e17;
+  --vp-c-brand-soft: rgb(63 158 34 / 14%);
+
+  /* light mode · surfaces */
+  --vp-c-bg: #f4f6fa;
+  --vp-c-bg-alt: #eef1f7;
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-bg-soft: #f5f7fb;
+  --vp-c-divider: #dfe5ee;
+  --vp-c-border: #dfe5ee;
+  --vp-c-gutter: #e8edf4;
+  --vp-c-text-1: #1b2733;
+  --vp-c-text-2: #4c5a68;
+  --vp-c-text-3: #93a0ae;
+
+  /* light mode · chrome */
+  --vp-nav-bg-color: rgb(244 246 250 / 82%);
+  --vp-sidebar-bg-color: #f4f6fa;
+
+  /* light mode · code */
+  --vp-code-block-bg: #f6f8fb;
+  --vp-code-color: #2c6e17;
+  --vp-code-bg: rgb(63 158 34 / 10%);
+
+  /* hero */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(92deg, #3f9e22 10%, #0d9488 90%);
+
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
 }
 
-.VPFeature {
-  border-radius: 16px;
+.dark {
+  /* dark mode · brand */
+  --vp-c-brand-1: #9af068;
+  --vp-c-brand-2: #7ddd45;
+  --vp-c-brand-3: #6cc93a;
+  --vp-c-brand-soft: rgb(154 240 104 / 13%);
+
+  /* dark mode · surfaces */
+  --vp-c-bg: #070a0f;
+  --vp-c-bg-alt: #0a0e14;
+  --vp-c-bg-elv: #0c1119;
+  --vp-c-bg-soft: #101722;
+  --vp-c-divider: #1e2836;
+  --vp-c-border: #1e2836;
+  --vp-c-gutter: #17202d;
+  --vp-c-text-1: #eef2f7;
+  --vp-c-text-2: #a8b3bf;
+  --vp-c-text-3: #5c6875;
+
+  /* dark mode · chrome */
+  --vp-nav-bg-color: rgb(7 10 15 / 78%);
+  --vp-sidebar-bg-color: #0a0e14;
+
+  /* dark mode · code */
+  --vp-code-block-bg: #0a0e15;
+  --vp-code-color: #9af068;
+  --vp-code-bg: rgb(154 240 104 / 11%);
+
+  /* hero */
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(92deg, #9af068 10%, #5eead4 90%);
 }
+
+::selection {
+  background: rgb(94 234 212 / 24%);
+}
+
+.dark ::selection {
+  background: rgb(154 240 104 / 22%);
+}
+
+/* ---------------------------------------------------------------- buttons */
+
+.VPButton.brand {
+  --vp-button-brand-text: #ffffff;
+  --vp-button-brand-hover-text: #ffffff;
+  --vp-button-brand-active-text: #ffffff;
+  border: none;
+  background-image: linear-gradient(135deg, #3f9e22, #0d9488);
+  box-shadow: 0 6px 18px rgb(63 158 34 / 24%);
+  transition:
+    filter 160ms ease,
+    transform 160ms ease;
+}
+
+.VPButton.brand:hover {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.dark .VPButton.brand {
+  --vp-button-brand-text: #06130a;
+  --vp-button-brand-hover-text: #06130a;
+  --vp-button-brand-active-text: #06130a;
+  background-image: linear-gradient(135deg, #9af068, #5eead4);
+  box-shadow: 0 6px 20px rgb(122 224 108 / 18%);
+}
+
+.VPButton.alt {
+  border-color: var(--vp-c-border);
+  background-color: var(--vp-c-bg-elv);
+}
+
+.VPButton.alt:hover {
+  border-color: var(--vp-c-brand-1);
+  color: var(--vp-c-brand-1);
+}
+
+/* ---------------------------------------------------------------- features */
+
+.VPFeature {
+  border-radius: 14px;
+  transition:
+    border-color 200ms ease,
+    transform 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.VPFeature:hover {
+  border-color: var(--vp-c-brand-soft);
+  box-shadow: 0 10px 30px rgb(2 6 12 / 14%);
+}
+
+.dark .VPFeature:hover {
+  border-color: rgb(154 240 104 / 30%);
+  box-shadow: 0 12px 34px rgb(0 0 0 / 35%);
+}
+
+.VPFeature .title {
+  font-weight: 700;
+}
+
+/* -------------------------------------------------------------- home hero */
+
+.VPHero .name {
+  font-family: 'SFMono-Regular', ui-monospace, Menlo, Consolas, 'Liberation Mono', monospace;
+  letter-spacing: -0.035em;
+}
+
+.VPHome {
+  position: relative;
+}
+
+.VPHome::before,
+.VPHome::after {
+  position: absolute;
+  z-index: 0;
+  content: '';
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+.VPHome::before {
+  top: -10rem;
+  left: 8%;
+  width: 40rem;
+  height: 28rem;
+  background: radial-gradient(closest-side, rgb(124 92 255 / 12%), transparent);
+}
+
+.VPHome::after {
+  top: -6rem;
+  right: 4%;
+  width: 34rem;
+  height: 24rem;
+  background: radial-gradient(closest-side, rgb(13 148 136 / 12%), transparent);
+}
+
+.dark .VPHome::before {
+  background: radial-gradient(closest-side, rgb(124 92 255 / 16%), transparent);
+}
+
+.dark .VPHome::after {
+  background: radial-gradient(closest-side, rgb(94 234 212 / 12%), transparent);
+}
+
+.VPHome > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* --------------------------------------------------------------- doc body */
+
+.vp-doc h1 {
+  letter-spacing: -0.02em;
+}
+
+.vp-doc div[class*='language-'] {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 12px;
+}
+
+.vp-doc div[class*='language-'] code {
+  font-variant-ligatures: none;
+}
+
+.DocSearch-Button {
+  border-radius: 8px;
+}
+
+/* ------------------------------------------------------------ demo embed */
 
 .demo-embed {
   margin-top: 24px;
   border: 1px solid var(--vp-c-divider);
   border-radius: 20px;
   overflow: hidden;
-  background:
-    linear-gradient(180deg, rgba(248, 250, 252, 0.92), rgba(255, 255, 255, 0.98));
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+  background: var(--vp-c-bg-elv);
+  box-shadow: 0 24px 48px rgb(15 23 42 / 8%);
+}
+
+.dark .demo-embed {
+  box-shadow: 0 24px 48px rgb(0 0 0 / 35%);
 }
 
 .demo-embed__header {
@@ -51,7 +263,7 @@
   width: 100%;
   min-height: 780px;
   border: 0;
-  background: #f8fafc;
+  background: var(--vp-c-bg);
 }
 
 .config-table code {

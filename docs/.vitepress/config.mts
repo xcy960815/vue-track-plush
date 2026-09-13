@@ -8,9 +8,7 @@ export default defineConfig({
   base: '/vue-track-plush/',
   cleanUrls: true,
   lastUpdated: true,
-  head: [
-    ['meta', { name: 'theme-color', content: '#2563eb' }],
-  ],
+  head: [['meta', { name: 'theme-color', content: '#070a0f' }]],
   locales: {
     root: {
       label: 'English',
@@ -33,9 +31,7 @@ export default defineConfig({
             ],
           },
         ],
-        socialLinks: [
-          { icon: 'github', link: repositoryUrl },
-        ],
+        socialLinks: [{ icon: 'github', link: repositoryUrl }],
         footer: {
           message: 'Released under the MIT License.',
           copyright: 'Copyright © xuchongyu',
@@ -63,9 +59,7 @@ export default defineConfig({
             ],
           },
         ],
-        socialLinks: [
-          { icon: 'github', link: repositoryUrl },
-        ],
+        socialLinks: [{ icon: 'github', link: repositoryUrl }],
         footer: {
           message: '基于 MIT 协议发布。',
           copyright: 'Copyright © xuchongyu',

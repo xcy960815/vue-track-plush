@@ -2,19 +2,19 @@
 
 ## 导出项
 
-| 导出项 | 类型 | 说明 |
-| --- | --- | --- |
-| `default` | Vue 插件 | 注册 `v-track` 指令，并安装全局埋点能力。 |
-| `clickEvent` | function | 手动发送点击埋点。 |
-| `browseEvent` | function | 手动发送浏览或页面访问埋点。 |
-| `exposureEvent` | function | 手动发送曝光埋点。 |
+| 导出项          | 类型     | 说明                                      |
+| --------------- | -------- | ----------------------------------------- |
+| `default`       | Vue 插件 | 注册 `v-track` 指令，并安装全局埋点能力。 |
+| `clickEvent`    | function | 手动发送点击埋点。                        |
+| `browseEvent`   | function | 手动发送浏览或页面访问埋点。              |
+| `exposureEvent` | function | 手动发送曝光埋点。                        |
 
 ## 指令模式
 
-| 指令 | 主要字段 | 典型场景 |
-| --- | --- | --- |
-| `v-track:click` | `buttonName` | 按钮、标签页、操作链接 |
-| `v-track:browse` | `pageName` | 路由容器、页面区块 |
+| 指令               | 主要字段       | 典型场景                     |
+| ------------------ | -------------- | ---------------------------- |
+| `v-track:click`    | `buttonName`   | 按钮、标签页、操作链接       |
+| `v-track:browse`   | `pageName`     | 路由容器、页面区块           |
 | `v-track:exposure` | `exposureName` | Banner、卡片、列表项进入视口 |
 
 同一个元素可以用 `|` 绑定多个事件类型。
