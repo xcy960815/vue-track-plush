@@ -1,386 +1,169 @@
 # vue-track-plush
 
-[中文文档](https://github.com/xcy960815/vue-track-plush/blob/3.0.0/README.zh-CN.md)
+[![npm](https://img.shields.io/npm/v/vue-track-plush.svg)](https://www.npmjs.com/package/vue-track-plush)
+[![License](https://img.shields.io/npm/l/vue-track-plush.svg)](https://github.com/xcy960815/vue-track-plush)
+[![npm](https://img.shields.io/npm/dm/vue-track-plush.svg)](https://github.com/xcy960815/vue-track-plush)
+[![CI](https://img.shields.io/badge/CI-passing-brightgreen.svg)](https://github.com/xcy960815/vue-track-plush/actions)
+[![GitHub issues](https://img.shields.io/github/issues/xcy960815/vue-track-plush.svg)](https://github.com/xcy960815/vue-track-plush/issues)
+[![GitHub stars](https://img.shields.io/github/stars/xcy960815/vue-track-plush.svg?style=social&label=Stars)](https://github.com/xcy960815/vue-track-plush)
+[![GitHub forks](https://img.shields.io/github/forks/xcy960815/vue-track-plush.svg?style=social&label=Fork)](https://github.com/xcy960815/vue-track-plush)
 
-- Documentation: https://xcy960815.github.io/vue-track-plush/
-- Online Demo: https://xcy960815.github.io/vue-track-plush/guide/demo
+- Documentation: [https://xcy960815.github.io/vue-track-plush/](https://xcy960815.github.io/vue-track-plush/)
+- Online Demo: [https://xcy960815.github.io/vue-track-plush/guide/demo](https://xcy960815.github.io/vue-track-plush/guide/demo)
+- 中文说明：[README.zh-CN.md](./README.zh-CN.md)
 
-Vue 2.7 tracking plugin based on custom directives. It supports click, page view, and exposure tracking, plus manual reporting APIs for custom scenarios.
+`vue-track-plush` is a Vue 2 plugin that reports click, browse, and exposure events through the `v-track` directive.
 
-> This package targets Vue 2.7. If you need Vue 3 support, use [vue3-track-plush](https://www.npmjs.com/package/vue3-track-plush).
+The peer dependency is `vue@^2.7.0`. Vue 3 projects should use [`vue3-track-plush`](https://www.npmjs.com/package/vue3-track-plush).
 
 ## Features
 
-- Vue 2 directive API with the recommended `v-track:click="{ ... }"`, `v-track:browse="{ ... }"`, and `v-track:exposure="{ ... }"` syntax
-- Manual APIs: `clickEvent`, `browseEvent`, `exposureEvent`
-- Legacy `track-params` string and object compatibility
-- Batched exposure reporting with queue, interval flush, and localStorage cache
-- Global and per-element exposure options
-- Configurable request timeout, credentials, headers, retry, and retry delay
-- Pluggable `transport`
-- TypeScript source and generated declaration file
-- Vite library build with UMD and ESM outputs
+- `v-track:click`, `v-track:browse`, and `v-track:exposure`
+- One element can listen to several events, such as `v-track:click|exposure`
+- A string value becomes `buttonName`, `pageName`, or `exposureName`
+- Exposure uses `IntersectionObserver`, with a queue and `localStorage` backup
+- `debug: true` prints the payload and does not send a request
+- Manual `clickEvent`, `browseEvent`, and `exposureEvent` helpers
 
 ## Installation
 
-```sh
+```bash
+npm install vue-track-plush -S
+```
+
+```bash
 pnpm add vue-track-plush
 ```
 
-```sh
-npm install vue-track-plush
-```
-
-```sh
-yarn add vue-track-plush
-```
-
-## Compatibility
-
-| Package                       | Version                                      |
-| ----------------------------- | -------------------------------------------- |
-| Vue                           | `^2.7.0`                                     |
-| Node.js for local development | <code>^20.19.0 &#124;&#124; >=22.12.0</code> |
-
 ## Quick Start
 
-Vue 2 installation is still `Vue.use(VueTrackPlush, config)`.
-
 ```ts
-import Vue from 'vue';
-import VueTrackPlush from 'vue-track-plush';
-import App from './App.vue';
+import Vue from 'vue'
+import VueTrackPlush from 'vue-track-plush'
 
 Vue.use(VueTrackPlush, {
+  projectName: 'demo',
   baseURL: 'https://example.com',
-  url: '/api/track',
-  projectName: 'my-project',
-  debug: process.env.NODE_ENV === 'development',
-  exposureThreshold: 0.5,
-  exposureDuration: 0,
-  exposureOnce: true,
-  exposureQueueMaxSize: 20,
-  exposureQueueFlushInterval: 2000,
-});
-
-new Vue({
-  render: (h) => h(App),
-}).$mount('#app');
+  url: '/track',
+})
 ```
-
-## Directive Usage
-
-### Click Tracking
 
 ```vue
-<template>
-  <button v-track:click="{ buttonName: 'Save' }">Save</button>
-</template>
+<button v-track:click="'buy'">Buy</button>
+<div v-track:browse="{ pageName: 'home' }">Home</div>
+<div v-track:exposure="{ exposureName: 'banner' }">Banner</div>
 ```
 
-When the directive value is a string, it is reported as `buttonName`.
+`projectName`, `baseURL`, and `url` are required for a real request. `baseURL` and `url` are joined into the request address.
 
-```vue
-<button v-track:click="'Save'">Save</button>
+## CDN / UMD Example
+
+Load Vue 2 first. The UMD global is `VueTrackPlush`. If `window.Vue` already exists, the plugin installs itself.
+
+```html
+<script src="https://unpkg.com/vue@2/dist/vue.js"></script>
+<script src="https://unpkg.com/vue-track-plush/dist/vue-track-plush.umd.js"></script>
+<script>
+  Vue.use(VueTrackPlush, {
+    projectName: 'demo',
+    baseURL: 'https://example.com',
+    url: '/track',
+  })
+</script>
 ```
 
-### Browse Tracking
+## API
 
-```vue
-<template>
-  <section v-track:browse="{ pageName: 'Profile Page' }">Profile</section>
-</template>
-```
+### Plugin config
 
-When the directive value is a string, it is reported as `pageName`.
+| Option                       | Type                      | Default            | Description                                      |
+| ---------------------------- | ------------------------- | ------------------ | ------------------------------------------------ |
+| `projectName`                | `string`                  | —                  | Sent with every event                            |
+| `baseURL`                    | `string`                  | —                  | Request origin or base path                      |
+| `url`                        | `string`                  | —                  | Path appended to `baseURL`                       |
+| `method`                     | `'GET' \| 'POST'`         | `'POST'`           | Built-in XHR method                              |
+| `pageName`                   | `string`                  | —                  | Default page name for manual browse events       |
+| `buttonName`                 | `string`                  | —                  | Default button name for manual click events      |
+| `exposureName`               | `string`                  | —                  | Default name for manual exposure events          |
+| `pageUrl`                    | `string`                  | current page       | Overrides the page URL on every event            |
+| `userAgent`                  | `string`                  | browser value      | Overrides the user agent on every event          |
+| `debug`                      | `boolean`                 | `false`            | Print the payload and skip the network           |
+| `exposureThreshold`          | `number`                  | `0.5`              | Visible ratio from 0 to 1                        |
+| `exposureDuration`           | `number`                  | `0`                | Milliseconds the target must stay visible        |
+| `exposureOnce`               | `boolean`                 | `true`             | Report each target once                          |
+| `exposureRoot`               | `Element \| Document \| null` | `null`         | `IntersectionObserver` root                      |
+| `exposureRootMargin`         | `string`                  | `'0px'`            | `IntersectionObserver` root margin               |
+| `exposureQueueMaxSize`       | `number`                  | `20`               | Flush the exposure queue at this size            |
+| `exposureQueueFlushInterval` | `number`                  | `2000`             | Flush interval, in milliseconds                  |
+| `exposureQueueStorageKey`    | `string`                  | `'cacheTrackData'` | `localStorage` key for the exposure queue        |
+| `timeout`                    | `number`                  | —                  | XHR timeout, in milliseconds                     |
+| `withCredentials`            | `boolean`                 | —                  | Send cookies with the XHR                        |
+| `headers`                    | `Record<string, string>`  | —                  | Extra XHR headers                                |
+| `retry`                      | `number`                  | —                  | XHR retry count                                  |
+| `retryDelay`                 | `number`                  | —                  | Delay between retries, in milliseconds           |
+| `transport`                  | `TrackTransport`          | XHR                | Replaces the built-in request                    |
 
-```vue
-<section v-track:browse="'Profile Page'">Profile</section>
-```
+`queue.maxBatchSize`, `queue.flushInterval`, and `queue.storageKey` are the old names for the queue options. `exposure.threshold`, `duration`, `root`, `rootMargin`, and `once` are the old names for the exposure options. `maxNum` is the old name for `exposureQueueMaxSize`.
 
-### Exposure Tracking
+### Directive
 
-```vue
-<template>
-  <div
-    v-track:exposure="{
-      exposureName: 'Promotion Banner',
-      threshold: 0.5,
-      duration: 1000,
-    }"
-  >
-    Promotion Banner
-  </div>
-</template>
-```
+| Argument   | When it reports                                      |
+| ---------- | ---------------------------------------------------- |
+| `click`    | On click                                             |
+| `browse`   | When the element is bound, and again if the value changes |
+| `exposure` | After the element stays visible long enough          |
 
-Exposure tracking uses `IntersectionObserver`. By default, an element is reported once when at least 50% of it enters the viewport. Each element can override `threshold`, `duration`, `once`, `root`, and `rootMargin` from the directive value; those control fields are removed from the final reporting payload.
+A string value maps to `buttonName`, `pageName`, or `exposureName`. An object is merged into the payload. The older `track-params` attribute still works when the directive value is empty.
 
-When the exposure directive value is a string, it is reported as `exposureName`.
+`v-track:click|exposure="'card'"` binds both events. Exposure control fields on the value, such as `threshold`, `duration`, `once`, `root`, and `rootMargin`, configure that element and are removed from the payload.
 
-```vue
-<div v-track:exposure="'Promotion Banner'">Promotion Banner</div>
-```
-
-### Legacy `track-params`
-
-The recommended syntax for new code is the directive value. The plugin still supports the previous `track-params` syntax for compatibility. It reads `vnode.data.attrs['track-params']` only when `binding.value` is `undefined`, then falls back to the DOM `track-params` attribute.
-
-```vue
-<button v-track:click track-params="Save">Save</button>
-
-<section v-track:browse :track-params="{ pageName: 'Profile Page' }">Profile</section>
-
-<div v-track:exposure :track-params="{ exposureName: 'Promotion Banner' }">Promotion Banner</div>
-```
-
-### Combined Directives
-
-Multiple event types can be bound to the same element with `|`.
-
-```vue
-<button v-track:click|exposure="{ buttonName: 'Buy Now', exposureName: 'Buy Button' }">
-  Buy Now
-</button>
-```
-
-## Manual APIs
+### Manual events
 
 ```ts
-import { browseEvent, clickEvent, exposureEvent } from 'vue-track-plush';
+import { clickEvent, browseEvent, exposureEvent } from 'vue-track-plush'
 
 clickEvent({
+  projectName: 'demo',
   baseURL: 'https://example.com',
-  url: '/api/track',
-  projectName: 'my-project',
-  buttonName: 'Save',
-  module: 'profile',
-});
-
-browseEvent({
-  baseURL: 'https://example.com',
-  url: '/api/track',
-  projectName: 'my-project',
-  pageName: 'Profile Page',
-});
-
-exposureEvent({
-  baseURL: 'https://example.com',
-  url: '/api/track',
-  projectName: 'my-project',
-  exposureName: 'Promotion Banner',
-});
+  url: '/track',
+  buttonName: 'buy',
+})
 ```
 
-## Configuration
+Each call creates its own tracker. Pass `projectName`, `baseURL`, and `url` again. `clickEvent` and `browseEvent` send immediately. `exposureEvent` sends immediately and does not enter the directive queue.
 
-```ts
-export interface TrackPlushConfig {
-  projectName: string;
-  baseURL: string;
-  url: string;
-  pageName?: string;
-  pageUrl?: string;
-  userAgent?: string;
-  method?: 'GET' | 'POST' | 'get' | 'post';
-  buttonName?: string;
-  exposureName?: string;
-  maxNum?: number;
-  timeout?: number;
-  withCredentials?: boolean;
-  headers?: Record<string, string>;
-  retry?: number;
-  retryDelay?: number;
-  exposureThreshold?: number;
-  exposureDuration?: number;
-  exposureOnce?: boolean;
-  exposureRoot?: Element | Document | null;
-  exposureRootMargin?: string;
-  exposureQueueMaxSize?: number;
-  exposureQueueFlushInterval?: number;
-  exposureQueueStorageKey?: string;
-  debug?: boolean;
-  transport?: TrackTransport;
-  queue?: QueueConfig;
-  exposure?: ExposureConfig;
-  [key: string]: unknown;
-}
+## Notes
 
-export interface TrackTransport {
-  send(requestConfig: RequestConfig): Promise<void> | void;
-}
+- `debug: true` logs `[vue-track-plush][debug]` and does not open a request.
+- Directive exposure is queued. The queue flushes at 20 items, every 2 seconds, and when the page is hidden or unloaded.
+- A failed request is swallowed. Tracking does not throw into the page.
+- Request settings (`baseURL`, `url`, `method`, `headers`, `timeout`, `retry`, `transport`, and the exposure settings) are not copied into the event payload.
 
-export interface RequestConfig {
-  baseURL?: string;
-  url?: string;
-  method?: 'GET' | 'POST' | 'get' | 'post';
-  data?: Record<string, unknown>;
-  debug?: boolean;
-  withCredentials?: boolean;
-  timeout?: number;
-  headers?: Record<string, string>;
-  retry?: number;
-  retryDelay?: number;
-}
+## Build Artifacts
 
-export interface QueueConfig {
-  maxBatchSize?: number;
-  flushInterval?: number;
-  storageKey?: string;
-}
+The published package currently includes:
 
-export interface ExposureConfig {
-  threshold?: number;
-  duration?: number;
-  root?: Element | Document | null;
-  rootMargin?: string;
-  once?: boolean;
-}
-```
-
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `projectName` | `string` | Required | Project name included in every event. |
-| `baseURL` | `string` | Required | Tracking API origin. |
-| `url` | `string` | Required | Tracking API path. |
-| `method` | `'GET' | 'POST'` | `'POST'` | Request method. |
-| `pageUrl` | `string` | `window.location.href` | Page URL included in every event. |
-| `userAgent` | `string` | `navigator.userAgent` | User agent included in every event. |
-| `timeout` | `number` | `10000` | Request timeout in milliseconds. |
-| `withCredentials` | `boolean` | `true` | Whether XHR sends credentials. |
-| `headers` | `Record<string, string>` | `{}` | Custom request headers. |
-| `retry` | `number` | `0` | Retry count after request failure. |
-| `retryDelay` | `number` | `300` | Retry delay in milliseconds. |
-| `debug` | `boolean` | `false` | Skip network requests and print the final tracking payload JSON to the console. |
-| `transport` | `TrackTransport` | built-in XHR transport | Custom reporting transport. |
-| `exposureThreshold` | `number` | `0.5` | Default visible ratio for exposure tracking. |
-| `exposureDuration` | `number` | `0` | Default visible duration in milliseconds before reporting exposure. |
-| `exposureOnce` | `boolean` | `true` | Whether each exposure element is reported only once. |
-| `exposureRoot` | `Element | Document | null` | `null` | Default IntersectionObserver root. |
-| `exposureRootMargin` | `string` | `'0px'` | Default IntersectionObserver root margin. |
-| `exposureQueueMaxSize` | `number` | `20` | Exposure batch size. |
-| `exposureQueueFlushInterval` | `number` | `2000` | Exposure queue flush interval in milliseconds. |
-| `exposureQueueStorageKey` | `string` | `'cacheTrackData'` | localStorage key for unsent exposure events. |
-
-Legacy config remains supported: `queue.maxBatchSize` maps to `exposureQueueMaxSize`, `queue.flushInterval` maps to `exposureQueueFlushInterval`, `queue.storageKey` maps to `exposureQueueStorageKey`, `exposure.threshold` maps to `exposureThreshold`, `exposure.duration` maps to `exposureDuration`, `exposure.root` maps to `exposureRoot`, `exposure.rootMargin` maps to `exposureRootMargin`, and `exposure.once` maps to `exposureOnce`.
-
-### Custom Transport
-
-```ts
-import VueTrackPlush, { type TrackTransport } from 'vue-track-plush';
-
-const transport: TrackTransport = {
-  send(requestConfig) {
-    return fetch(`${requestConfig.baseURL}${requestConfig.url}`, {
-      method: requestConfig.method || 'POST',
-      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-      body: JSON.stringify(requestConfig.data),
-      credentials: 'include',
-    }).then(() => undefined);
-  },
-};
-
-Vue.use(VueTrackPlush, {
-  baseURL: 'https://example.com',
-  url: '/api/track',
-  projectName: 'my-project',
-  transport,
-});
-```
-
-## Payload Shape
-
-When `debug` is enabled, the same payload is printed to the console with the `[vue-track-plush][debug]` prefix and no network request is sent.
-
-Click and browse events are sent as a single object.
-
-```json
-{
-  "actionType": "点击事件",
-  "projectName": "my-project",
-  "userAgent": "...",
-  "pageUrl": "https://example.com/profile",
-  "timestamp": 1710000000000,
-  "buttonName": "Save",
-  "module": "profile"
-}
-```
-
-Exposure events are sent in batches using the same standard array shape as the Vue 3 package.
-
-```json
-[
-  {
-    "actionType": "曝光事件",
-    "projectName": "my-project",
-    "userAgent": "...",
-    "pageUrl": "https://example.com/home",
-    "timestamp": 1710000000000,
-    "exposureName": "Promotion Banner",
-    "bannerId": 1001
-  }
-]
-```
-
-## Demo
-
-The local demo uses Vue Router and includes separate cases for different tracking scenarios.
-
-| Route        | Case                                                                 |
-| ------------ | -------------------------------------------------------------------- |
-| `#/click`    | Directive click tracking and manual click tracking                   |
-| `#/browse`   | Directive browse tracking and manual browse tracking                 |
-| `#/exposure` | First-screen exposure, scroll exposure, and manual exposure tracking |
-
-Start the demo:
-
-```sh
-pnpm install
-pnpm dev
-```
+- `dist/vue-track-plush.esm.js`: ESM build
+- `dist/vue-track-plush.umd.js`: UMD build
+- `types/vue-track-plush.d.ts`: TypeScript declarations
 
 ## Development
 
-```sh
+```bash
 pnpm install
-pnpm dev
+pnpm run dev
+pnpm run lint
+pnpm run build
 ```
 
-Build the plugin:
+## Project Structure
 
-```sh
-pnpm build
-```
-
-Build outputs:
-
-- `dist/vue-track-plush.umd.js`
-- `dist/vue-track-plush.esm.js`
-- `types/vue-track-plush.d.ts`
-
-Watch plugin build:
-
-```sh
-pnpm dev:plugin
-```
-
-## Architecture
-
-The package keeps the Vue 2 adapter thin and moves tracking behavior into an internal core layer.
-
-```txt
-plugin/
-  index.ts              # Vue 2 install function, directive registration, public APIs
-  click.ts              # DOM click binding
-  browse.ts             # Browse directive handling
-  exposure.ts           # IntersectionObserver binding
-  core/
-    tracker.ts          # Unified click/browse/exposure reporting
-    queue.ts            # Exposure queue, interval flush, failure recovery
-    storage.ts          # Safe localStorage wrapper
-    transport.ts        # XHR transport and retry logic
-    payload.ts          # Payload normalization
-```
+- `plugin/index.ts`: plugin entry, directive, and manual events
+- `plugin/click.ts`: click directive
+- `plugin/browse.ts`: browse directive
+- `plugin/exposure.ts`: exposure observer
+- `plugin/core/tracker.ts`: payload, queue, and transport
+- `src/`: local demo
 
 ## License
 
